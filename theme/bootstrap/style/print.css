@@ -1,0 +1,16 @@
+@media print {
+	body>div.footer,
+	#page-navbar,
+	footer,
+	#page-header,
+	#dock,
+	.buttons,
+	aside
+	{
+		display:none !important;
+	}
+	#region-main,#region-main>.container{
+		width:100% !important;
+		left:0;
+	}
+}
