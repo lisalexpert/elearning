@@ -42,6 +42,7 @@ echo $OUTPUT->doctype() ?>
     <title><?php echo $OUTPUT->page_title(); ?></title>
     <link rel="shortcut icon" href="<?php echo $OUTPUT->favicon(); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
+    <script type="text/javascript" src="//script.crazyegg.com/pages/scripts/0067/5351.js" async="async"></script>
     <?php echo $OUTPUT->standard_head_html(); ?>
 	<link id="print" media="all" type="text/css" href="<?php echo $CFG->wwwroot.'/theme/'.$CFG->theme.'/style/print.css' ?>" rel="stylesheet" />
 	<style>
