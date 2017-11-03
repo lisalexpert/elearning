@@ -19,6 +19,9 @@
                 <li>
                     <a title="Visit UNECE website" href="http://www.unece.org/" target="_blank" class="sprite-logo unece">UNECE</a>
                 </li>
+                <li>
+                    <a title="Visit ECOLEX website" href="http://www.ecolex.org/" target="_blank" class="sprite-logo ecolex">ECOLEX</a>
+                </li>
                 <li class="pull-right">
                     <a title="Visit European Commission website" href="http://ec.europa.eu" target="_blank" class="eu-logo"><img width="88" height="60" src="<?php echo $OUTPUT->pix_url('eu_logo_footer_color','theme') ?>"><br>European Union</a>
                 </li>

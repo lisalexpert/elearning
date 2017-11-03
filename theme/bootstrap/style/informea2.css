@@ -1722,7 +1722,7 @@ a:focus .qty {
         color: #fff;
         margin-bottom:10px;
     }
-    
+
     .navbar-nav > .dropdown:hover > a:after {
         display: none;
     }
@@ -2704,8 +2704,8 @@ div.rod .panel-title:after {
     font-size: 12px;
     line-height: 17px;
 }
-.search-results .panel-heading a.anchor { 
-display: none; 
+.search-results .panel-heading a.anchor {
+display: none;
 }
 .search-results .panel-heading:hover a.anchor { display: inline-block; }
 .download-button{
@@ -2802,27 +2802,100 @@ display: none;
     margin-left: -14px;
 }
 
-.sprite-logo:before{content:"";display:block;width:60px;height:60px;margin:0 auto;background:url([[pix:theme|all_logos_gray]]) no-repeat}.sprite-logo:active:before,.sprite-logo:focus:before,.sprite-logo:hover:before{background-image:url([[pix:theme|all_logos_colour]])}.sprite-logo.itpgrfa:before{background-position:-60px 0}.sprite-logo.stockholm:before{background-position:-120px 0}.sprite-logo.un:before{background-position:-300px 0}.sprite-logo.basel:before{background-position:-360px 0}.sprite-logo.ozone:before{background-position:-420px 0}.sprite-logo.unccd:before{background-position:-480px 0}.sprite-logo.cbd:before{background-position:-540px 0}.sprite-logo.unece:before{background-position:-660px 0}.sprite-logo.cites:before{background-position:-720px 0}.sprite-logo.ramsar:before{background-position:-780px 0}.sprite-logo.abidjan:before,.sprite-logo.unep:before{background-position:-840px 0}.sprite-logo.cms:before{background-position:-900px 0}.sprite-logo.unesco:before{background-position:-1020px 0}.sprite-logo.fao:before{background-position:-1080px 0}.sprite-logo.rotterdam:before{background-position:-1140px 0}.sprite-logo.unfccc:before{background-position:-1200px 0}.sprite-logo.later:before{background-position:-1380px 0}
-.sprite-logo.whc:before {
-    background-position: -1380px 0;
+.sprite-logo:before {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    background: url([[pix:theme|logos]]) no-repeat;
+    background-position-y: -60px;
 }
-.sprite-logo.unccd:before,
-.sprite-logo.abidjan:before, .sprite-logo.unep:before{
-  background-image:url([[pix:theme|logos]]);
+
+.sprite-logo:active:before,
+.sprite-logo:focus:before,
+.sprite-logo:hover:before {
+    background-position-y: 0;
 }
+
+.sprite-logo.itpgrfa:before {
+    background-position-x: -60px;
+}
+
+.sprite-logo.stockholm:before {
+    background-position-x: -120px;
+}
+
+.sprite-logo.un:before {
+    background-position-x: -300px;
+}
+
+.sprite-logo.basel:before {
+    background-position-x: -360px;
+    width: 92px;
+}
+
+.sprite-logo.ozone:before {
+    background-position-x: -460px;
+    width: 145px;
+}
+
+.sprite-logo.unccd:before {
+    background-position-x: -605px;
+    width: 164px;
+}
+
+.sprite-logo.cbd:before {
+    background-position-x: -769px;
+}
+
+.sprite-logo.unece:before {
+    background-position-x: -1819px;
+    width: 150px;
+}
+.sprite-logo.ecolex:before {
+    background-position-x: -1969px;
+    width: 58px;
+}
+.sprite-logo.cites:before {
+    background-position-x: -949px;
+}
+
+.sprite-logo.ramsar:before {
+    background-position-x: -1009px;
+}
+
 .sprite-logo.abidjan:before,
-.sprite-logo.unep:before{
-  background-position: -984px -60px;
-  width: 77px;
+.sprite-logo.unep:before {
+    background-position-x: -1069px;
+    width: 77px;
 }
-.sprite-logo.abidjan:hover:before,
-.sprite-logo.unep:hover:before{
-  background-position: -984px 0;
+
+.sprite-logo.cms:before {
+    background-position-x: -1149px;
 }
-.sprite-logo.unccd:before{
-  background-position: -520px -60px;
-  width: 164px;
+
+.sprite-logo.unesco:before {
+    background-position-x: -1269px;
 }
-.sprite-logo.unccd:hover:before{
-  background-position: -520px 0;
+
+.sprite-logo.fao:before {
+    background-position-x: -1329px;
+    width: 158px;
+}
+
+.sprite-logo.rotterdam:before {
+    background-position-x: -1519px;
+}
+
+.sprite-logo.unfccc:before {
+    background-position-x: -1579px;
+}
+
+.sprite-logo.whc:before {
+    background-position-x: -1759px;
+}
+
+.sprite-logo.later:before {
+    background-position-x: -1759px;
 }
