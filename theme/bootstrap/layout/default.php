@@ -42,7 +42,14 @@ echo $OUTPUT->doctype() ?>
     <title><?php echo $OUTPUT->page_title(); ?></title>
     <link rel="shortcut icon" href="<?php echo $OUTPUT->favicon(); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
-    <script type="text/javascript" src="//script.crazyegg.com/pages/scripts/0067/5351.js" async="async"></script>
+    <script type="text/javascript">
+        window.smartlook||(function(d) {
+            var o=smartlook=function(){ o.api.push(arguments)},h=d.getElementsByTagName('head')[0];
+            var c=d.createElement('script');o.api=new Array();c.async=true;c.type='text/javascript';
+            c.charset='utf-8';c.src='https://rec.smartlook.com/recorder.js';h.appendChild(c);
+        })(document);
+        smartlook('init', '0de702f6d7de31817c785d9aa3f47f68815193da');
+    </script>
     <?php echo $OUTPUT->standard_head_html(); ?>
 	<link id="print" media="all" type="text/css" href="<?php echo $CFG->wwwroot.'/theme/'.$CFG->theme.'/style/print.css' ?>" rel="stylesheet" />
 	<style>
