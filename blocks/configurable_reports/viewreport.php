@@ -62,6 +62,9 @@
 		print_error("badpermissions",'block_configurable_reports');
 	}
 
+  $PAGE->requires->css(new moodle_url($CFG->httpswwwroot.'/blocks/configurable_reports/js/datatables/media/css/jquery.dataTables.css'));
+  $PAGE->requires->css(new moodle_url($CFG->httpswwwroot.'/blocks/configurable_reports/js/codemirror/lib/codemirror.css'));
+  $PAGE->requires->css(new moodle_url($CFG->httpswwwroot.'/blocks/configurable_reports/js/codemirror/addon/display/fullscreen.css'));
 	$PAGE->set_context($context);
 	$PAGE->set_pagelayout('incourse');
 	$PAGE->set_url('/blocks/configurable_reports/viewreport.php', array('id'=>$id));
