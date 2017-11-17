@@ -1151,6 +1151,8 @@ function certificate_get_date($certificate, $certrecord, $course, $userid = null
             $certificatedate = userdate($date, '%B %Y');
         } else if ($certificate->datefmt == 5) {
             $certificatedate = userdate($date, get_string('strftimedate', 'langconfig'));
+        } else if ($certificate->datefmt == 6) {
+            $certificatedate = userdate($date, '%d/%m/%Y',99,false,false);
         }
 
         return $certificatedate;
