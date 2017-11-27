@@ -1527,4 +1527,7 @@ table.course_section_elements {
   body:not(.mceContentBody) .course_section_summary_text > h2 > strong{
     display: block;
   }
+  body:not(.mceContentBody) .course_section_summary_text > h2:before{
+    display:none;
+  }
 }
