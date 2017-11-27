@@ -1299,6 +1299,7 @@ a.course_summary_flyer{
 .course_section_summary_image_content{
   display:inline-block;
   border-radius:50%;
+  max-width: 100%;
 }
 body.category-11 .course_section_summary_wrapper{
   border-top-color: #dd920e;
