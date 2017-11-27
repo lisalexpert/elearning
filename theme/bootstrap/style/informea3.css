@@ -1388,6 +1388,7 @@ body.category-9 .course_section_element > svg.replaced-svg.stroke path {
 table.course_section_elements td{
   text-align: center;
   padding: 3%;
+  vertical-align: top;
 }
 table.course_section_elements {
   table-layout:fixed;
