@@ -213,6 +213,9 @@ if (isguestuser() or !isloggedin()) {
   <div id="signup-login-popup-container">
     <div id="signup-login-popup">
       <div id="signup-login-content">
+        <span id="signup-button-close">
+          <i class="fa fa-times"></i>
+        </span>
         <div id="signup-login">
           <input class="signup-login-radios" id="signup-login-type-up" type="radio" name="sign-type" value="up" checked="checked"/>
           <input class="signup-login-radios" id="signup-login-type-in" type="radio" name="sign-type" value="in"/>
@@ -352,7 +355,20 @@ $(document).ready(function(){
     this.submit();
     return false;
   });
-  $('#signup-login-popup-wrapper').toggleClass('opened');
+  $('#page-content').on('click','a[href]',function(e){
+    event.preventDefault();
+    event.stopPropagation();
+    $('#signup-login-popup-wrapper').toggleClass('opened');
+    return false;
+  });
+  $('#signup-button-close').on('click', function(e){
+    $('#signup-login-popup-wrapper').toggleClass('opened');
+  });
+  $('#signup-login-popup-wrapper').on('click', function(e){
+    if(e.target !== this)
+      return;
+    $('#signup-login-popup-wrapper').toggleClass('opened');
+  });
 <?php } ?>
   jQuery('img.replace-svg').each(function(){
     var $img = jQuery(this);
