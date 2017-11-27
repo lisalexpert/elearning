@@ -1455,3 +1455,76 @@ table.course_section_elements {
 #page-course-view-topics .topics > li.section > .content > .summary > .no-overflow{
   margin-bottom:0;
 }
+.course_section_elements:not([width]):not([height]){
+  width:100%;
+}
+@media only screen and ( max-width: 1199px ) {
+  body:not(.mceContentBody) table.course_section_summary {
+    text-align: center;
+  }
+  body:not(.mceContentBody) table.course_section_elements{
+    width:100% !important;
+    text-align: center;
+  }
+  body:not(.mceContentBody) table.course_section_summary tr{
+    display: block;
+    padding: 10px;
+  }
+  body:not(.mceContentBody) .course_section_summary_image{
+    display: inline-block;
+    float: left;
+    margin-top: -10px;
+    margin-left: -10px;
+    width: 100px;
+    padding: 10px;
+  }
+  body:not(.mceContentBody) .course_section_summary_text{
+    display:inline;
+    text-align: left;
+  }
+  body:not(.mceContentBody) .course_section_summary_text > h2{
+    min-height:80px;
+    display:table;
+    margin-top:0;
+  }
+  body:not(.mceContentBody) .course_section_summary_text > h2:before{
+    content: "";
+    min-height:80px;
+    display:inline-block;
+  }
+  body:not(.mceContentBody) .course_section_summary_text > h2 > strong{
+    display:table-cell;
+    vertical-align: middle;
+  }
+  body:not(.mceContentBody) .course_section_element{
+    word-break: break-word;
+  }
+  body:not(.mceContentBody) .course_section_element span{
+    display:block;
+    max-width: 160px;
+  }
+  body:not(.mceContentBody) table.course_section_elements tr{
+    display:inline;
+  }
+  body:not(.mceContentBody) table.course_section_elements td{
+    vertical-align: top;
+    display:inline-block;
+  }
+}
+@media only screen and ( max-width: 315px ) {
+  body:not(.mceContentBody) .course_section_summary_image{
+    float:none;
+    display:inline-block;
+  }
+  body:not(.mceContentBody) .course_section_summary_text{
+    padding-top: 0;
+    display:block;
+  }
+  body:not(.mceContentBody) .course_section_summary_text > h2{
+    display: block;
+    min-height: auto;
+  }
+  body:not(.mceContentBody) .course_section_summary_text > h2 > strong{
+    display: block;
+  }
+}
