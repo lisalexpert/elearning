@@ -353,7 +353,7 @@ if (isloggedin() and !isguestuser()) {
     echo $OUTPUT->box_end();
 } else {
     $loginform = new \core_auth\output\login($authsequence, $frm->username);
-    if(!empty($CFG->lockoutduration)){
+    if($errorcode!==4 && !empty($CFG->lockoutduration)){
       $errormsg .= ' ' . get_string("lockoutloginwarning");
     }
     $loginform->set_error($errormsg);
