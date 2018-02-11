@@ -2056,3 +2056,5 @@ $string['maxbytesforfile'] = 'The file {$a} is larger than the maximum size allo
 $string['modchooserenable'] = 'Activity chooser on';
 $string['modchooserdisable'] = 'Activity chooser off';
 $string['confirmpassword'] = 'Retype the password';
+$string['lockoutloginwarning'] = 'Your account will be temporarily locked after failing several login attempts';
+$string['lockoutlogin'] = 'Your account is locked, please try again in 15 minutes';

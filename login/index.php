@@ -252,6 +252,8 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
         if (empty($errormsg)) {
             if ($errorcode == AUTH_LOGIN_UNAUTHORISED) {
                 $errormsg = get_string("unauthorisedlogin", "", $frm->username);
+            } elseif ($errorcode == AUTH_LOGIN_LOCKOUT) {
+                $errormsg = get_string("lockoutlogin");
             } else {
                 $errormsg = get_string("invalidlogin");
                 $errorcode = 3;
