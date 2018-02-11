@@ -334,6 +334,9 @@ if (!empty($SESSION->loginerrormsg)) {
 } else if ($errormsg or !empty($frm->password)) {
     // We must redirect after every password submission.
     if ($errormsg) {
+        if($errorcode!==4 && !empty($CFG->lockoutthreshold) && !empty($CFG->lockoutduration)){
+          $errormsg .= '. ' . get_string("lockoutloginwarning");
+        }
         $SESSION->loginerrormsg = $errormsg;
     }
     redirect(new moodle_url($CFG->httpswwwroot . '/login/index.php'));
@@ -343,7 +346,6 @@ $PAGE->set_title("$site->fullname: $loginsite");
 $PAGE->set_heading("$site->fullname");
 
 echo $OUTPUT->header();
-
 if (isloggedin() and !isguestuser()) {
     // prevent logging when already logged in, we do not want them to relogin by accident because sesskey would be changed
     echo $OUTPUT->box_start();
@@ -353,9 +355,6 @@ if (isloggedin() and !isguestuser()) {
     echo $OUTPUT->box_end();
 } else {
     $loginform = new \core_auth\output\login($authsequence, $frm->username);
-    if($errorcode!==4 && !empty($CFG->lockoutduration)){
-      $errormsg .= ' ' . get_string("lockoutloginwarning");
-    }
     $loginform->set_error($errormsg);
     echo $OUTPUT->render($loginform);
 }
