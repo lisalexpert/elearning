@@ -82,12 +82,15 @@ $string['cleanreadtime'] = 'Mark old posts as read hour';
 $string['clicktounsubscribe'] = 'You are subscribed to this discussion. Click to unsubscribe.';
 $string['clicktosubscribe'] = 'You are not subscribed to this discussion. Click to subscribe.';
 $string['completiondiscussions'] = 'Student must create discussions:';
+$string['completiondiscussionsdesc'] = 'Student must create at least {$a} discussion(s)';
 $string['completiondiscussionsgroup'] = 'Require discussions';
 $string['completiondiscussionshelp'] = 'requiring discussions to complete';
 $string['completionposts'] = 'Student must post discussions or replies:';
+$string['completionpostsdesc'] = 'Student must post at least {$a} discussion(s) or reply/replies';
 $string['completionpostsgroup'] = 'Require posts';
 $string['completionpostshelp'] = 'requiring discussions or replies to complete';
 $string['completionreplies'] = 'Student must post replies:';
+$string['completionrepliesdesc'] = 'Student must post at least {$a} reply/replies';
 $string['completionrepliesgroup'] = 'Require replies';
 $string['completionreplieshelp'] = 'requiring replies to complete';
 $string['configcleanreadtime'] = 'The hour of the day to clean old posts from the \'read\' table.';
@@ -103,6 +106,7 @@ $string['configoldpostdays'] = 'Number of days old any post is considered read.'
 $string['configreplytouser'] = 'When a forum post is mailed out, should it contain the user\'s email address so that recipients can reply personally rather than via the forum? Even if set to \'Yes\' users can choose in their profile to keep their email address secret.';
 $string['configrsstypedefault'] = 'If RSS feeds are enabled, sets the default activity type.';
 $string['configrssarticlesdefault'] = 'If RSS feeds are enabled, sets the default number of articles (either discussions or posts).';
+$string['configsubscriptiontype'] = 'Default setting for subscription mode.';
 $string['configshortpost'] = 'Any post under this length (in characters not including HTML) is considered short (see below).';
 $string['configtrackingtype'] = 'Default setting for read tracking.';
 $string['configtrackreadposts'] = 'Set to \'yes\' if you want to track read/unread for each user.';
@@ -232,7 +236,7 @@ $string['forum:exportdiscussion'] = 'Export whole discussion';
 $string['forum:exportownpost'] = 'Export own post';
 $string['forum:exportpost'] = 'Export post';
 $string['forumintro'] = 'Description';
-$string['forum:managesubscriptions'] = 'Manage subscriptions';
+$string['forum:managesubscriptions'] = 'Manage subscribers';
 $string['forum:movediscussions'] = 'Move discussions';
 $string['forum:pindiscussions'] = 'Pin discussions';
 $string['forum:postwithoutthrottling'] = 'Exempt from post threshold';
@@ -265,6 +269,10 @@ $string['forum:viewsubscribers'] = 'View subscribers';
 $string['generalforum'] = 'Standard forum for general use';
 $string['generalforums'] = 'General forums';
 $string['hiddenforumpost'] = 'Hidden forum post';
+$string['indicator:cognitivedepth'] = 'Forum cognitive';
+$string['indicator:cognitivedepth_help'] = 'This indicator is based on the cognitive depth reached by the student in a Forum activity.';
+$string['indicator:socialbreadth'] = 'Forum social';
+$string['indicator:socialbreadth_help'] = 'This indicator is based on the social breadth reached by the student in a Forum activity.';
 $string['inforum'] = 'in {$a}';
 $string['introblog'] = 'The posts in this forum were copied here automatically from blogs of users in this course because those blog entries are no longer available';
 $string['intronews'] = 'General news and announcements';
@@ -286,6 +294,8 @@ Users with the capability to reply to locked discussions can unlock a discussion
 $string['longpost'] = 'Long post';
 $string['mailnow'] = 'Send forum post notifications with no editing-time delay';
 $string['manydiscussions'] = 'Discussions per page';
+$string['managesubscriptionsoff'] = 'Finish managing subscriptions';
+$string['managesubscriptionson'] = 'Manage subscribers';
 $string['markalldread'] = 'Mark all posts in this discussion read.';
 $string['markallread'] = 'Mark all posts in this forum read.';
 $string['markasreadonnotification'] = 'When sending forum post notifications';
@@ -428,6 +438,7 @@ $string['qandaforum'] = 'Q and A forum';
 $string['qandanotify'] = 'This is a question and answer forum. In order to see other responses to these questions, you must first post your answer';
 $string['re'] = 'Re:';
 $string['readtherest'] = 'Read the rest of this topic';
+$string['removeallforumtags'] = 'Remove all forum tags';
 $string['replies'] = 'Replies';
 $string['repliesmany'] = '{$a} replies so far';
 $string['repliesone'] = '{$a} reply so far';
@@ -462,6 +473,7 @@ $string['searcholderposts'] = 'Search older posts...';
 $string['searchphrase'] = 'This exact phrase must appear in the post';
 $string['searchresults'] = 'Search results';
 $string['searchsubject'] = 'These words should be in the subject';
+$string['searchtags'] = 'Is tagged with';
 $string['searchuser'] = 'This name should match the author';
 $string['searchuserid'] = 'The Moodle ID of the author';
 $string['searchwhichforums'] = 'Choose which forums to search';
@@ -493,14 +505,14 @@ $string['subscriptionmode_help'] = 'When a participant is subscribed to a forum 
 * Optional subscription - Participants can choose whether to be subscribed
 * Forced subscription - Everyone is subscribed and cannot unsubscribe
 * Auto subscription - Everyone is subscribed initially but can choose to unsubscribe at any time
-* Subscription disabled - Subscriptions are not allowed
-
-Note: Any subscription mode changes will only affect users who enrol in the course in the future, and not existing users.';
+* Subscription disabled - Subscriptions are not allowed';
 $string['subscriptionoptional'] = 'Optional subscription';
 $string['subscriptionforced'] = 'Forced subscription';
 $string['subscriptionauto'] = 'Auto subscription';
 $string['subscriptiondisabled'] = 'Subscription disabled';
 $string['subscriptions'] = 'Subscriptions';
+$string['tagarea_forum_posts'] = 'Forum posts';
+$string['tagsdeleted'] = 'Forum tags have been deleted';
 $string['thisforumisthrottled'] = 'This forum has a limit to the number of forum postings you can make in a given time period - this is currently set at {$a->blockafter} posting(s) in {$a->blockperiod}';
 $string['timedhidden'] = 'Timed status: Hidden from students';
 $string['timedposts'] = 'Timed posts';
@@ -543,9 +555,6 @@ $string['warnformorepost'] = 'Warning! There is more than one discussion in this
 $string['yournewquestion'] = 'Your new question';
 $string['yournewtopic'] = 'Your new discussion topic';
 $string['yourreply'] = 'Your reply';
-
-// Deprecated since Moodle 3.0.
-$string['subscribersto'] = 'Subscribers to "{$a->name}"';
 
 // Deprecated since Moodle 3.1.
 $string['postmailinfo'] = 'This is a copy of a message posted on the {$a} website.

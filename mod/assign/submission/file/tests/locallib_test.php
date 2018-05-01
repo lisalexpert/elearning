@@ -136,6 +136,4 @@ class assignsubmission_file_locallib_testcase extends advanced_testcase {
             'Without file' => [null, true]
         ];
     }
-
-
 }

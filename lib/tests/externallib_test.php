@@ -43,6 +43,36 @@ class core_externallib_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Tests for external_settings class.
+     */
+    public function test_external_settings() {
+
+        $settings = \external_settings::get_instance();
+        $currentraw = $settings->get_raw();
+        $currentfilter = $settings->get_filter();
+        $currentfile = $settings->get_file();
+        $currentfileurl = $settings->get_fileurl();
+
+        $this->assertInstanceOf('external_settings', $settings);
+
+        // Check apis.
+        $settings->set_file('plugin.php');
+        $this->assertEquals('plugin.php', $settings->get_file());
+        $settings->set_filter(false);
+        $this->assertFalse($settings->get_filter());
+        $settings->set_fileurl(false);
+        $this->assertFalse($settings->get_fileurl());
+        $settings->set_raw(true);
+        $this->assertTrue($settings->get_raw());
+
+        // Restore original values.
+        $settings->set_file($currentfile);
+        $settings->set_filter($currentfilter);
+        $settings->set_fileurl($currentfileurl);
+        $settings->set_raw($currentraw);
+    }
+
     public function test_validate_params() {
         $params = array('text'=>'aaa', 'someid'=>'6');
         $description = new external_function_parameters(array('someid' => new external_value(PARAM_INT, 'Some int value'),
@@ -510,6 +540,7 @@ class core_externallib_testcase extends advanced_testcase {
             'timemodified' => $timemodified,
             'filesize' => $filesize,
             'mimetype' => 'text/plain',
+            'isexternalfile' => false,
         );
         // Get all the files for the area.
         $files = external_util::get_area_files($context, $component, $filearea, false);
@@ -529,7 +560,8 @@ class core_externallib_testcase extends advanced_testcase {
         $description = new external_files();
 
         // First check that the expected default values and keys are returned.
-        $expectedkeys = array_flip(array('filename', 'filepath', 'filesize', 'fileurl', 'timemodified', 'mimetype'));
+        $expectedkeys = array_flip(array('filename', 'filepath', 'filesize', 'fileurl', 'timemodified', 'mimetype',
+            'isexternalfile', 'repositorytype'));
         $returnedkeys = array_flip(array_keys($description->content->keys));
         $this->assertEquals($expectedkeys, $returnedkeys);
         $this->assertEquals('List of files.', $description->desc);
@@ -540,6 +572,31 @@ class core_externallib_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test default time for user created tokens.
+     */
+    public function test_user_created_tokens_duration() {
+        global $CFG, $DB;
+        $this->resetAfterTest(true);
+
+        $CFG->enablewebservices = 1;
+        $CFG->enablemobilewebservice = 1;
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $service = $DB->get_record('external_services', array('shortname' => MOODLE_OFFICIAL_MOBILE_SERVICE, 'enabled' => 1));
+
+        $this->setUser($user1);
+        $timenow = time();
+        $token = external_generate_token_for_current_user($service);
+        $this->assertGreaterThanOrEqual($timenow + $CFG->tokenduration, $token->validuntil);
+
+        // Change token default time.
+        $this->setUser($user2);
+        set_config('tokenduration', DAYSECS);
+        $token = external_generate_token_for_current_user($service);
+        $timenow = time();
+        $this->assertLessThanOrEqual($timenow + DAYSECS, $token->validuntil);
+    }
 }
 
 /*

@@ -199,6 +199,10 @@ class api {
         // Make sure to limit searches to enrolled courses.
         $enrolledcourses = enrol_get_my_courses(array('id', 'cacherev'));
         $courses = array();
+        // Really we want the user to be able to view the participants if they have the capability
+        // 'moodle/course:viewparticipants' or 'moodle/course:enrolreview', but since the search_courses function
+        // only takes required parameters we can't. However, the chance of a user having 'moodle/course:enrolreview' but
+        // *not* 'moodle/course:viewparticipants' are pretty much zero, so it is not worth addressing.
         if ($arrcourses = \coursecat::search_courses(array('search' => $search), array('limit' => $limitnum),
                 array('moodle/course:viewparticipants'))) {
             foreach ($arrcourses as $course) {
@@ -283,7 +287,14 @@ class api {
                         FROM {message}
                         WHERE
                             (useridto = ? AND timeusertodeleted = 0 AND notification = 0)
-                            OR
+                        UNION ALL
+                        SELECT
+                            id, useridfrom, useridto, subject, fullmessage, fullmessageformat,
+                            fullmessagehtml, smallmessage, notification, contexturl,
+                            contexturlname, timecreated, timeuserfromdeleted, timeusertodeleted,
+                            component, eventtype, 0 as timeread
+                        FROM {message}
+                        WHERE
                             (useridfrom = ? AND timeuserfromdeleted = 0 AND notification = 0)
                         UNION ALL
                         SELECT
@@ -294,7 +305,14 @@ class api {
                         FROM {message_read}
                         WHERE
                             (useridto = ? AND timeusertodeleted = 0 AND notification = 0)
-                            OR
+                        UNION ALL
+                        SELECT
+                            id, useridfrom, useridto, subject, fullmessage, fullmessageformat,
+                            fullmessagehtml, smallmessage, notification, contexturl,
+                            contexturlname, timecreated, timeuserfromdeleted, timeusertodeleted,
+                            component, eventtype, timeread
+                        FROM {message_read}
+                        WHERE
                             (useridfrom = ? AND timeuserfromdeleted = 0 AND notification = 0)";
         $allmessagesparams = [$userid, $userid, $userid, $userid];
 
@@ -350,7 +368,11 @@ class api {
                         FROM {message}
                         WHERE
                             (useridto = ? AND timeusertodeleted = 0 AND notification = 0)
-                            OR
+                            AND timecreated $timecreatedsql
+                        UNION ALL
+                        SELECT id, useridfrom, useridto, timecreated
+                        FROM {message}
+                        WHERE
                             (useridfrom = ? AND timeuserfromdeleted = 0 AND notification = 0)
                             AND timecreated $timecreatedsql
                         UNION ALL
@@ -358,14 +380,19 @@ class api {
                         FROM {message_read}
                         WHERE
                             (useridto = ? AND timeusertodeleted = 0 AND notification = 0)
-                            OR
+                            AND timecreated $timecreatedsql
+                        UNION ALL
+                        SELECT id, useridfrom, useridto, timecreated
+                        FROM {message_read}
+                        WHERE
                             (useridfrom = ? AND timeuserfromdeleted = 0 AND notification = 0)
                             AND timecreated $timecreatedsql";
         $messageidsql = "SELECT $convosig, max(id) as id, timecreated
                          FROM ($allmessagestimecreated) x
                          WHERE $messageidwhere
                          GROUP BY $convocase, timecreated";
-        $messageidparams = array_merge([$userid, $userid], $timecreatedparams, [$userid, $userid], $timecreatedparams);
+        $messageidparams = array_merge([$userid], $timecreatedparams, [$userid], $timecreatedparams,
+                [$userid], $timecreatedparams, [$userid], $timecreatedparams);
         $messageidrecords = $DB->get_records_sql($messageidsql, $messageidparams);
 
         // Ok, let's recap. We've pulled a descending ordered list of conversations by latest time created

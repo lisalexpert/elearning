@@ -27,27 +27,13 @@
 require('../config.php');
 require_once('lib.php');
 
-// Try to prevent searching for sites that allow sign-up.
-if (!isset($CFG->additionalhtmlhead)) {
-    $CFG->additionalhtmlhead = '';
-}
-$CFG->additionalhtmlhead .= '<meta name="robots" content="noindex" />';
-
 redirect_if_major_upgrade_required();
 
 $testsession = optional_param('testsession', 0, PARAM_INT); // test session works properly
-$cancel      = optional_param('cancel', 0, PARAM_BOOL);      // redirect to frontpage, needed for loginhttps
 $anchor      = optional_param('anchor', '', PARAM_RAW);      // Used to restore hash anchor to wantsurl.
 
-if ($cancel) {
-    redirect(new moodle_url('/'));
-}
-
-//HTTPS is required in this page when $CFG->loginhttps enabled
-$PAGE->https_required();
-
 $context = context_system::instance();
-$PAGE->set_url("$CFG->httpswwwroot/login/index.php");
+$PAGE->set_url("$CFG->wwwroot/login/index.php");
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('login');
 
@@ -216,13 +202,16 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
     /// Currently supported only for ldap-authentication module
         $userauth = get_auth_plugin($USER->auth);
         if (!isguestuser() and !empty($userauth->config->expiration) and $userauth->config->expiration == 1) {
+            $externalchangepassword = false;
             if ($userauth->can_change_password()) {
                 $passwordchangeurl = $userauth->change_password_url();
                 if (!$passwordchangeurl) {
-                    $passwordchangeurl = $CFG->httpswwwroot.'/login/change_password.php';
+                    $passwordchangeurl = $CFG->wwwroot.'/login/change_password.php';
+                } else {
+                    $externalchangepassword = true;
                 }
             } else {
-                $passwordchangeurl = $CFG->httpswwwroot.'/login/change_password.php';
+                $passwordchangeurl = $CFG->wwwroot.'/login/change_password.php';
             }
             $days2expire = $userauth->password_expire($USER->username);
             $PAGE->set_title("$site->fullname: $loginsite");
@@ -233,7 +222,15 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
                 echo $OUTPUT->footer();
                 exit;
             } elseif (intval($days2expire) < 0 ) {
-                set_user_preference('auth_forcepasswordchange', 1, $USER);
+                if ($externalchangepassword) {
+                    // We end the session if the change password form is external. This prevents access to the site
+                    // until the password is correctly changed.
+                    require_logout();
+                } else {
+                    // If we use the standard change password form, this user preference will be reset when the password
+                    // is changed. Until then it will prevent access to the site.
+                    set_user_preference('auth_forcepasswordchange', 1, $USER);
+                }
                 echo $OUTPUT->header();
                 echo $OUTPUT->confirm(get_string('auth_passwordisexpired', 'auth'), $passwordchangeurl, $urltogo);
                 echo $OUTPUT->footer();
@@ -276,9 +273,9 @@ if (empty($SESSION->wantsurl)) {
     if ($referer &&
             $referer != $CFG->wwwroot &&
             $referer != $CFG->wwwroot . '/' &&
-            $referer != $CFG->httpswwwroot . '/login/' &&
-            strpos($referer, $CFG->httpswwwroot . '/login/?') !== 0 &&
-            strpos($referer, $CFG->httpswwwroot . '/login/index.php') !== 0) { // There might be some extra params such as ?lang=.
+            $referer != $CFG->wwwroot . '/login/' &&
+            strpos($referer, $CFG->wwwroot . '/login/?') !== 0 &&
+            strpos($referer, $CFG->wwwroot . '/login/index.php') !== 0) { // There might be some extra params such as ?lang=.
         $SESSION->wantsurl = $referer;
     }
 }
@@ -301,9 +298,6 @@ if (!empty($CFG->alternateloginurl)) {
 
     redirect($loginurl->out(false));
 }
-
-// make sure we really are on the https page when https login required
-$PAGE->verify_https_required();
 
 /// Generate the login page with forms
 
@@ -339,7 +333,7 @@ if (!empty($SESSION->loginerrormsg)) {
         }
         $SESSION->loginerrormsg = $errormsg;
     }
-    redirect(new moodle_url($CFG->httpswwwroot . '/login/index.php'));
+    redirect(new moodle_url('/login/index.php'));
 }
 
 $PAGE->set_title("$site->fullname: $loginsite");
@@ -349,8 +343,8 @@ echo $OUTPUT->header();
 if (isloggedin() and !isguestuser()) {
     // prevent logging when already logged in, we do not want them to relogin by accident because sesskey would be changed
     echo $OUTPUT->box_start();
-    $logout = new single_button(new moodle_url($CFG->httpswwwroot.'/login/logout.php', array('sesskey'=>sesskey(),'loginpage'=>1)), get_string('logout'), 'post');
-    $continue = new single_button(new moodle_url($CFG->httpswwwroot.'/login/index.php', array('cancel'=>1)), get_string('cancel'), 'get');
+    $logout = new single_button(new moodle_url('/login/logout.php', array('sesskey'=>sesskey(),'loginpage'=>1)), get_string('logout'), 'post');
+    $continue = new single_button(new moodle_url('/'), get_string('cancel'), 'get');
     echo $OUTPUT->confirm(get_string('alreadyloggedin', 'error', fullname($USER)), $logout, $continue);
     echo $OUTPUT->box_end();
 } else {
