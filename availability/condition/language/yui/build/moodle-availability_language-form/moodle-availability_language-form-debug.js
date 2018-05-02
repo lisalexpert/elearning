@@ -7,18 +7,10 @@ YUI.add('moodle-availability_language-form', function (Y, NAME) {
  */
 M.availability_language = M.availability_language || {};
 
-/**
- * @class M.availability_language.form
- * @extends M.core_availability.plugin
- */
+// Class M.availability_language.form @extends M.core_availability.plugin.
 M.availability_language.form = Y.Object(M.core_availability.plugin);
 
-/**
- * Languages available for selection.
- *
- * @property languages
- * @type Array
- */
+// Languages available for selection.
 M.availability_language.form.languages = null;
 
 /**
@@ -33,17 +25,16 @@ M.availability_language.form.initInner = function(languages) {
 
 M.availability_language.form.getNode = function(json) {
     // Create HTML structure.
-    var strings = M.str.availability_language;
-    var html = '<label>' + strings.title + ' <span class="availability-language">' +
-            '<select name="id">' +
-            '<option value="choose">' + M.str.moodle.choosedots + '</option>';
+    var tit = M.util.get_string('title', 'availability_language');
+    var html = '<label class="form-group"><span class="p-r-1">' + tit + '</span>';
+    html += '<span class="availability-language"><select class="custom-select" name="id" title=' + tit + '>';
+    html += '<option value="choose">' + M.util.get_string('choosedots', 'moodle') + '</option>';
     for (var i = 0; i < this.languages.length; i++) {
         var language = this.languages[i];
-        // String has already been escaped using format_string.
         html += '<option value="' + language.id + '">' + language.name + '</option>';
     }
     html += '</select></span></label>';
-    var node = Y.Node.create('<span>' + html + '</span>');
+    var node = Y.Node.create('<span class="form-inline">' + html + '</span>');
 
     // Set initial values (leave default 'choose' if creating afresh).
     if (json.creating === undefined) {
@@ -57,7 +48,7 @@ M.availability_language.form.getNode = function(json) {
     // Add event handlers (first time only).
     if (!M.availability_language.form.addedEvents) {
         M.availability_language.form.addedEvents = true;
-        var root = Y.one('#fitem_id_availabilityconditionsjson');
+        var root = Y.one('.availability-field');
         root.delegate('change', function() {
             // Just update the form fields.
             M.core_availability.form.update();
@@ -77,14 +68,10 @@ M.availability_language.form.fillValue = function(value, node) {
 };
 
 M.availability_language.form.fillErrors = function(errors, node) {
-    var value = {};
-    this.fillValue(value, node);
-
-    // Check language item id.
-    if (value.id === '') {
+    var selected = node.one('select[name=id]').get('value');
+    if (selected === 'choose') {
         errors.push('availability_language:missing');
     }
-
 };
 
 

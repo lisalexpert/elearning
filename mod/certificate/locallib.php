@@ -369,6 +369,7 @@ function certificate_get_issue($course, $user, $certificate, $cm) {
     $certissue->userid = $user->id;
     $certissue->code = certificate_generate_code();
     $certissue->timecreated =  time();
+    $certissue->lang = current_language();
     $certissue->id = $DB->insert_record('certificate_issues', $certissue);
 
     // Email to the teachers and anyone else
@@ -882,6 +883,8 @@ function certificate_get_date($certificate, $certrecord, $course, $userid = null
             $certificatedate = userdate($date, '%B %Y');
         } else if ($certificate->datefmt == 5) {
             $certificatedate = userdate($date, get_string('strftimedate', 'langconfig'));
+        } else if ($certificate->datefmt == 6) {
+          $certificatedate = userdate($date, '%d/%m/%Y',99,false,false);
         }
 
         return $certificatedate;

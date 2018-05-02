@@ -113,7 +113,7 @@ class auth_plugin_email extends auth_plugin_base {
      * @since Moodle 3.2
      */
     public function user_signup_with_confirmation($user, $notify=true, $confirmationurl = null) {
-        global $CFG, $DB, $PAGE;
+        global $CFG, $DB;
         require_once($CFG->dirroot.'/user/profile/lib.php');
         require_once($CFG->dirroot.'/user/lib.php');
 
@@ -138,20 +138,13 @@ class auth_plugin_email extends auth_plugin_base {
         }
 
         if ($notify) {
-            global $CFG, $PAGE, $OUTPUT, $SESSION;
+            global $CFG, $PAGE, $OUTPUT;
             $emailconfirm = get_string('emailconfirm');
             $PAGE->navbar->add($emailconfirm);
             $PAGE->set_title($emailconfirm);
             $PAGE->set_heading($PAGE->course->fullname);
             echo $OUTPUT->header();
-            
-            $redirect_to = "$CFG->wwwroot/index.php";
-            
-            if (!empty($SESSION->wantsurl)) {
-               $redirect_to = $SESSION->wantsurl;
-            }
-            
-            notice(get_string('emailconfirmsent', '', $user->email), $redirect_to);
+            notice(get_string('emailconfirmsent', '', $user->email), "$CFG->wwwroot/index.php");
         } else {
             return true;
         }

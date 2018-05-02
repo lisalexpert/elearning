@@ -18,7 +18,7 @@
  * Condition main class.
  *
  * @package availability_language
- * @copyright 2014 Renaat Debleu (www.eWallah.net)
+ * @copyright 2018 Renaat Debleu (www.eWallah.net)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -55,12 +55,30 @@ class condition extends \core_availability\condition {
         }
     }
 
+    /**
+     * Saves data back to a structure object.
+     *
+     * @return \stdClass Structure object
+     */
     public function save() {
-        $result = (object)array('type' => 'language');
+        $result = (object)['type' => 'language'];
         if ($this->languageid) {
             $result->id = $this->languageid;
         }
         return $result;
+    }
+
+    /**
+     * Returns a JSON object which corresponds to a condition of this type.
+     *
+     * Intended for unit testing, as normally the JSON values are constructed
+     * by JavaScript code.
+     *
+     * @param string $languageid Not required language
+     * @return stdClass Object representing condition
+     */
+    public static function get_json($languageid = '') {
+        return (object)['type' => 'language', 'id' => $languageid];
     }
 
     /**
@@ -76,14 +94,29 @@ class condition extends \core_availability\condition {
      * @return bool True if available
      */
     public function is_available($not, \core_availability\info $info, $grabthelot, $userid) {
+        global $CFG, $DB, $USER;
+
         // If course has forced language.
         $course = $info->get_course();
         $allow = false;
-
         if (isset($course->lang) && $course->lang == $this->languageid) {
             $allow = true;
         }
-        if (current_language() == $this->languageid) {
+        if ($userid == $USER->id) {
+            // Checking the language of the currently logged in user, so do not
+            // default to the account language, because the session language
+            // or the language of the current course may be different.
+            $language = current_language();
+        } else {
+            // Checking access for someone else than the logged in user, so
+            // use the preferred language of that user account.
+            $language = $DB->get_field('user', 'lang', ['id' => $userid]);
+            if (empty($language)) {
+                // The user had no preferred language set, so fall back to site language or English.
+                $language = isset($CFG->lang) ? $CFG->lang : 'en';
+            }
+        }
+        if ($language == $this->languageid) {
             $allow = true;
         }
         if ($not) {
@@ -101,8 +134,7 @@ class condition extends \core_availability\condition {
      * @param bool $full Set true if this is the 'full information' view
      * @param bool $not Set true if we are inverting the condition
      * @param info $info Item we're checking
-     * @return string Information string (for admin) about all restrictions on
-     *   this item
+     * @return string Information string (for admin) about all restrictions on this item
      */
     public function get_description($full, $not, \core_availability\info $info) {
         if ($this->languageid == '') {

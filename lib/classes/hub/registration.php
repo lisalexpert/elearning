@@ -537,6 +537,8 @@ class registration {
      * @param string|moodle_url $url
      */
     public static function registration_reminder($url) {
+        // Force no registration
+        return;
         if (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING) {
             // No redirection during behat runs.
             return;

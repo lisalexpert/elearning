@@ -13,17 +13,19 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-/* Learning Plan Block
- * This plugin serves as a database and plan for all learning activities in the organziation, 
+
+/**
+ * This plugin serves as a database and plan for all learning activities in the organization,
  * where such activities are organized for a more structured learning program.
- * @package blocks
- * @author: Azmat Ullah, Talha Noor
- * @date: 20-Aug-2014
- * @copyright  Copyrights © 2012 - 2014 | 3i Logic (Pvt) Ltd.
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block_learning_plan
+ * @copyright  3i Logic<lms@3ilogic.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @author     Azmat Ullah <azmat@3ilogic.com>
  */
-$plugin->version   =   2014082000;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  =   2011070100;        // Requires Moodle 2.1 or later
-$plugin->release = '2.7';
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->version = 2017032103;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires = 2010112400;        // Requires Moodle 2.1 or later.
+$plugin->release = '3.2';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->component = 'block_learning_plan'; 
+$plugin->component = 'block_learning_plan';
