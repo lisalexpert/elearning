@@ -2,3 +2,206 @@ body > nav.navbar{
 	background: none;
 	box-shadow: none;
 }
+.navbar-brand{
+	white-space: initial;
+}
+@media (max-width: 767px){
+	.desktop_only{
+		display:none !important;
+	}
+	#tounep{
+		height:50px;
+	}
+	#tounep > img{
+		max-height:100%;
+	}
+	.navbar-toggle{
+		margin-top: 10px;
+	}
+}
+@media (min-width: 768px){
+	.not_desktop{
+		display:none !important;
+	}
+	#menu_top_1 .navbar-nav:last-child {
+		margin-right:0;
+	}
+	.navbar-header{
+		float:none;
+	}
+}
+#menu_top_2{
+	float:right;
+}
+#menu_top_2 > ul{
+	margin: 0;
+	padding: 0;
+	right: 0;
+	display: inline-block;
+}
+#menu_top_2 > ul > li{
+	margin-top:0;
+	list-style: none;
+	display: inline;
+}
+#moodle-navbar {
+	padding-bottom: 10px;
+}
+#moodle-navbar .navbar-right >li>a{
+	border-right-width: 0;
+	margin: 10px 0 0 0;
+	color: #fff !important;
+	font-size: 18px !important;
+}
+#moodle-navbar .navbar-nav > li:hover > a,#moodle-navbar .navbar-nav > .open > a, #moodle-navbar .navbar-nav > li > a:hover, #moodle-navbar .navbar-nav > li > a:focus{
+	background: #0099D5 !important;
+	color: #fff !important;
+}
+#menu_top_2 > ul > li > a{
+	float: left;
+	line-height: 52px;
+	height: 77px;
+	border-left: 0 solid #D6D6D6;
+	border-bottom: 1px solid #fff;
+	border-top: 3px solid #fff;
+	padding: .5em 1em;
+	color: #656565 !important;
+	font-weight: 400;
+	margin: 0;
+	font-size: 22px!important;
+	text-transform: initial;
+	border-right-width:0;
+}
+#menu_top_2 .navbar-nav > li:hover > a,#menu_top_2 .navbar-nav > .open > a, #menu_top_2 .navbar-nav > li > a:hover, #menu_top_2 .navbar-nav > li > a:focus{
+	background: rgba(239, 228, 228, .3) !important;
+}
+#menu_top_1 {
+	background-color: #242424;
+	height: 40px;
+	display: flex;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+	flex-direction: row;
+}
+#menu_top_1 > .user_menu{
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	width: 100%;
+}
+#theme_title{
+	margin-left: 35px;
+	color: #fff;
+	line-height: 40px;
+	font-weight: 400;
+	font-size: 1.0em;
+	display: block;
+	white-space: nowrap;
+}
+#menu_top_1 .navbar-nav > li{
+	margin-top:0;
+}
+#menu_top_1 .navbar-nav > li:not(:last-child){
+	margin-right:5px;
+}
+.theme_menu .navbar-nav > li > a{
+	margin-bottom:0;
+	padding: 10px 12px;
+	border-width: 0;
+}
+#menu_top_1 .navbar-nav > li:hover > a,#menu_top_1 .navbar-nav > .open > a, #menu_top_1 .navbar-nav > li > a:hover, #menu_top_1 .navbar-nav > li > a:focus{
+	background: rgba(112, 101, 101, .6) !important;
+	color: #fff !important;
+}
+.theme_menu .dropdown-menu{
+	background: #0084b4;
+	border-width:0;
+	padding:0;
+	color:#fff;
+	min-width: 100%;
+	max-width: 500px;
+}
+@media (max-width: 767px){
+	.theme_menu .dropdown-menu{
+		max-width: 300px;
+	}
+}
+.theme_menu .dropdown-menu > li > a:empty{
+	display:none;
+}
+.theme_menu .dropdown-menu > li{
+	text-overflow: ellipsis;
+}
+.theme_menu .dropdown-menu > li > a{
+	color: #fff;
+	padding: 10px 20px;
+	line-height: 18px;
+	font-size: 14px;
+	overflow:hidden;
+	text-overflow: ellipsis;
+}
+.navbar-nav > li > a .caret{
+	border-width:0;
+	vertical-align:top;
+	width:15px;
+}
+.navbar-nav > li > a .caret:after{
+	height: initial;
+	border-width: 0;
+	color: #fff;
+	font-family: 'FontAwesome';
+	content: "\f078";
+	font-size: 14px;
+	margin-left: 5px;
+}
+.theme_menu .dropdown-menu > li > a > i {
+	margin-right: 5px;
+}
+#menu_top_2.theme_menu .navbar-nav > li > a .caret:after{
+	color: inherit;
+}
+#quick-signin-form,#quick-signin-form h2{
+	color: #fff;
+}
+#quick-signin-form small > a{
+	color: #fff;
+	text-decoration:underline;
+}
+.header_shadow{
+	height: 4px;
+	width: 100%;
+	background-color: rgba(0, 0, 0, .15);
+	position: relative;
+}
+.navbar-header{
+	width:100%;
+}
+.footer{
+	color: #fff;
+	font-size: 100%;
+	color: #fff;
+	background-color: #0083B3;
+	border-top: 10px solid #fff;
+}
+.footer a, .footer a:visited,
+.footer h3{
+	color: #fff;
+}
+#disclaimer a{
+	text-decoration: underline;
+}
+.footer .section{
+	border-top-color: #fff;
+}
+.sprite-logo:before{
+	-webkit-filter: brightness(2);
+	filter: brightness(2);
+}
+.sprite-logo.basel:before{
+	-webkit-filter: brightness(4);
+	filter: brightness(4);
+}
+.sprite-logo:active:before, .sprite-logo:focus:before, .sprite-logo:hover:before{
+	-webkit-filter: brightness(1);
+	filter: brightness(initial);
+}
