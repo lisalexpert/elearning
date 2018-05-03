@@ -180,8 +180,11 @@ body > nav.navbar{
 	color: #fff;
 	font-size: 100%;
 	color: #fff;
-	background-color: #0083B3;
 	border-top: 10px solid #fff;
+	background-color: transparent;
+}
+.footer > .container{
+	background-color: #0083B3;
 }
 .footer a, .footer a:visited,
 .footer h3{
