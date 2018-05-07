@@ -584,10 +584,10 @@ class manager {
                 'usestream' => true,
             ));
 
-            if ($part === $plainpartid) {
+            if ($part == $plainpartid) {
                 $contentplain = $this->process_message_part_body($messagedata, $partdata, $part);
 
-            } else if ($part === $htmlpartid) {
+            } else if ($part == $htmlpartid) {
                 $contenthtml = $this->process_message_part_body($messagedata, $partdata, $part);
 
             } else if ($filename = $partdata->getName($part)) {
@@ -1012,7 +1012,7 @@ class manager {
         $messageparams = new \stdClass();
         $messageparams->html    = $message->html;
         $messageparams->plain   = $message->plain;
-        $messagepreferencesurl = new \moodle_url("/message/edit.php", array('id' => $USER->id));
+        $messagepreferencesurl = new \moodle_url("/message/notificationpreferences.php", array('id' => $USER->id));
         $messageparams->messagepreferencesurl = $messagepreferencesurl->out();
         $htmlmessage = get_string('messageprocessingsuccesshtml', 'tool_messageinbound', $messageparams);
         $plainmessage = get_string('messageprocessingsuccess', 'tool_messageinbound', $messageparams);

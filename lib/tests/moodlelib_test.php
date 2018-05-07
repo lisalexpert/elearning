@@ -597,12 +597,27 @@ class core_moodlelib_testcase extends advanced_testcase {
 
     public function test_clean_param_url() {
         // Test PARAM_URL and PARAM_LOCALURL a bit.
+        // Valid URLs.
         $this->assertSame('http://google.com/', clean_param('http://google.com/', PARAM_URL));
         $this->assertSame('http://some.very.long.and.silly.domain/with/a/path/', clean_param('http://some.very.long.and.silly.domain/with/a/path/', PARAM_URL));
         $this->assertSame('http://localhost/', clean_param('http://localhost/', PARAM_URL));
         $this->assertSame('http://0.255.1.1/numericip.php', clean_param('http://0.255.1.1/numericip.php', PARAM_URL));
+        $this->assertSame('https://google.com/', clean_param('https://google.com/', PARAM_URL));
+        $this->assertSame('https://some.very.long.and.silly.domain/with/a/path/', clean_param('https://some.very.long.and.silly.domain/with/a/path/', PARAM_URL));
+        $this->assertSame('https://localhost/', clean_param('https://localhost/', PARAM_URL));
+        $this->assertSame('https://0.255.1.1/numericip.php', clean_param('https://0.255.1.1/numericip.php', PARAM_URL));
+        $this->assertSame('ftp://ftp.debian.org/debian/', clean_param('ftp://ftp.debian.org/debian/', PARAM_URL));
         $this->assertSame('/just/a/path', clean_param('/just/a/path', PARAM_URL));
+        // Invalid URLs.
         $this->assertSame('', clean_param('funny:thing', PARAM_URL));
+        $this->assertSame('', clean_param('http://example.ee/sdsf"f', PARAM_URL));
+        $this->assertSame('', clean_param('javascript://comment%0Aalert(1)', PARAM_URL));
+        $this->assertSame('', clean_param('rtmp://example.com/livestream', PARAM_URL));
+        $this->assertSame('', clean_param('rtmp://example.com/live&foo', PARAM_URL));
+        $this->assertSame('', clean_param('rtmp://example.com/fms&mp4:path/to/file.mp4', PARAM_URL));
+        $this->assertSame('', clean_param('mailto:support@moodle.org', PARAM_URL));
+        $this->assertSame('', clean_param('mailto:support@moodle.org?subject=Hello%20Moodle', PARAM_URL));
+        $this->assertSame('', clean_param('mailto:support@moodle.org?subject=Hello%20Moodle&cc=feedback@moodle.org', PARAM_URL));
     }
 
     public function test_clean_param_localurl() {
@@ -625,21 +640,23 @@ class core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame('/just/a/path', clean_param('/just/a/path', PARAM_LOCALURL));
         $this->assertSame('course/view.php?id=3', clean_param('course/view.php?id=3', PARAM_LOCALURL));
 
-        // Local absolute HTTPS.
+        // Local absolute HTTPS in a non HTTPS site.
+        $CFG->wwwroot = str_replace('https:', 'http:', $CFG->wwwroot); // Need to simulate non-https site.
         $httpsroot = str_replace('http:', 'https:', $CFG->wwwroot);
-        $CFG->loginhttps = false;
         $this->assertSame('', clean_param($httpsroot, PARAM_LOCALURL));
         $this->assertSame('', clean_param($httpsroot . '/with/something?else=true', PARAM_LOCALURL));
-        $CFG->loginhttps = true;
+
+        // Local absolute HTTPS in a HTTPS site.
+        $CFG->wwwroot = str_replace('http:', 'https:', $CFG->wwwroot);
+        $httpsroot = $CFG->wwwroot;
         $this->assertSame($httpsroot, clean_param($httpsroot, PARAM_LOCALURL));
         $this->assertSame($httpsroot . '/with/something?else=true',
             clean_param($httpsroot . '/with/something?else=true', PARAM_LOCALURL));
 
         // Test open redirects are not possible.
-        $CFG->loginhttps = false;
         $CFG->wwwroot = 'http://www.example.com';
         $this->assertSame('', clean_param('http://www.example.com.evil.net/hack.php', PARAM_LOCALURL));
-        $CFG->loginhttps = true;
+        $CFG->wwwroot = 'https://www.example.com';
         $this->assertSame('', clean_param('https://www.example.com.evil.net/hack.php', PARAM_LOCALURL));
     }
 
@@ -990,6 +1007,29 @@ class core_moodlelib_testcase extends advanced_testcase {
                 shorten_text($text, 1));
     }
 
+    public function test_shorten_filename() {
+        // Test filename that contains more than 100 characters.
+        $filename = 'sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem';
+        $this->assertSame('sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium tot',
+            shorten_filename($filename));
+        // Filename contains extension.
+        $this->assertSame('sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium tot.zip',
+            shorten_filename($filename . '.zip'));
+        // Limit filename to 50 chars.
+        $this->assertSame('sed ut perspiciatis unde omnis iste natus error si',
+            shorten_filename($filename, 50));
+        $this->assertSame('sed ut perspiciatis unde omnis iste natus error si.zip',
+            shorten_filename($filename . '.zip', 50));
+
+        // Test filename that contains less than 100 characters.
+        $filename = 'sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque';
+        $this->assertSame('sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque',
+            shorten_filename($filename));
+        // Filename contains extension.
+        $this->assertSame('sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque.zip',
+            shorten_filename($filename . '.zip'));
+    }
+
     public function test_usergetdate() {
         global $USER, $CFG, $DB;
         $this->resetAfterTest();
@@ -1192,6 +1232,26 @@ class core_moodlelib_testcase extends advanced_testcase {
         } catch (moodle_exception $ex) {
             $this->assertInstanceOf('coding_exception', $ex);
         }
+    }
+
+    public function test_set_user_preference_for_current_user() {
+        global $USER;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        set_user_preference('test_pref', 2);
+        set_user_preference('test_pref', 1, $USER->id);
+        $this->assertEquals(1, get_user_preferences('test_pref'));
+    }
+
+    public function test_unset_user_preference_for_current_user() {
+        global $USER;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        set_user_preference('test_pref', 1);
+        unset_user_preference('test_pref', $USER->id);
+        $this->assertNull(get_user_preferences('test_pref'));
     }
 
     public function test_get_extra_user_fields() {
@@ -1787,7 +1847,7 @@ class core_moodlelib_testcase extends advanced_testcase {
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException PHPUnit\Framework\Error\Warning
      */
     public function test_get_string_limitation() {
         // This is one of the limitations to the lang_string class. It can't be
@@ -3379,17 +3439,17 @@ class core_moodlelib_testcase extends advanced_testcase {
      * @param string $email Email address for the from user.
      * @param int $display The user's email display preference.
      * @param bool $samecourse Are the users in the same course?
+     * @param string $config The CFG->allowedemaildomains config values
      * @param bool $result The expected result.
      * @dataProvider data_can_send_from_real_email_address
      */
-    public function test_can_send_from_real_email_address($email, $display, $samecourse, $result) {
-        global $DB;
+    public function test_can_send_from_real_email_address($email, $display, $samecourse, $config, $result) {
         $this->resetAfterTest();
 
         $fromuser = $this->getDataGenerator()->create_user();
         $touser = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
-        $alloweddomains = ['example.com'];
+        set_config('allowedemaildomains', $config);
 
         $fromuser->email = $email;
         $fromuser->maildisplay = $display;
@@ -3399,7 +3459,7 @@ class core_moodlelib_testcase extends advanced_testcase {
         } else {
             $this->getDataGenerator()->enrol_user($fromuser->id, $course->id, 'student');
         }
-        $this->assertEquals($result, can_send_from_real_email_address($fromuser, $touser, $alloweddomains));
+        $this->assertEquals($result, can_send_from_real_email_address($fromuser, $touser));
     }
 
     /**
@@ -3411,31 +3471,95 @@ class core_moodlelib_testcase extends advanced_testcase {
         return [
             // Test from email is in allowed domain.
             // Test that from display is set to show no one.
-            ['email' => 'fromuser@example.com', 'display' => core_user::MAILDISPLAY_HIDE,
-             'samecourse' => false, 'result' => false],
+            [
+                'email' => 'fromuser@example.com',
+                'display' => core_user::MAILDISPLAY_HIDE,
+                'samecourse' => false,
+                'config' => "example.com\r\ntest.com",
+                'result' => false
+            ],
             // Test that from display is set to course members only (course member).
-            ['email' => 'fromuser@example.com', 'display' => core_user::MAILDISPLAY_COURSE_MEMBERS_ONLY,
-             'samecourse' => true, 'result' => true],
+            [
+                'email' => 'fromuser@example.com',
+                'display' => core_user::MAILDISPLAY_COURSE_MEMBERS_ONLY,
+                'samecourse' => true,
+                'config' => "example.com\r\ntest.com",
+                'result' => true
+            ],
             // Test that from display is set to course members only (Non course member).
-            ['email' => 'fromuser@example.com', 'display' => core_user::MAILDISPLAY_COURSE_MEMBERS_ONLY,
-             'samecourse' => false, 'result' => false],
-             // Test that from display is set to show everyone.
-            ['email' => 'fromuser@example.com', 'display' => core_user::MAILDISPLAY_EVERYONE,
-             'samecourse' => false, 'result' => true],
+            [
+                'email' => 'fromuser@example.com',
+                'display' => core_user::MAILDISPLAY_COURSE_MEMBERS_ONLY,
+                'samecourse' => false,
+                'config' => "example.com\r\ntest.com",
+                'result' => false
+            ],
+            // Test that from display is set to show everyone.
+            [
+                'email' => 'fromuser@example.com',
+                'display' => core_user::MAILDISPLAY_EVERYONE,
+                'samecourse' => false,
+                'config' => "example.com\r\ntest.com",
+                'result' => true
+            ],
+            // Test a few different config value formats for parsing correctness.
+            [
+                'email' => 'fromuser@example.com',
+                'display' => core_user::MAILDISPLAY_EVERYONE,
+                'samecourse' => false,
+                'config' => "\n test.com\nexample.com \n",
+                'result' => true
+            ],
+            [
+                'email' => 'fromuser@example.com',
+                'display' => core_user::MAILDISPLAY_EVERYONE,
+                'samecourse' => false,
+                'config' => "\r\n example.com \r\n test.com \r\n",
+                'result' => true
+            ],
 
             // Test from email is not in allowed domain.
             // Test that from display is set to show no one.
-            ['email' => 'fromuser@moodle.com', 'display' => core_user::MAILDISPLAY_HIDE,
-             'samecourse' => false, 'result' => false],
-             // Test that from display is set to course members only (course member).
-            ['email' => 'fromuser@moodle.com', 'display' => core_user::MAILDISPLAY_COURSE_MEMBERS_ONLY,
-             'samecourse' => true, 'result' => false],
-             // Test that from display is set to course members only (Non course member.
-            ['email' => 'fromuser@moodle.com', 'display' => core_user::MAILDISPLAY_COURSE_MEMBERS_ONLY,
-             'samecourse' => false, 'result' => false],
-             // Test that from display is set to show everyone.
-            ['email' => 'fromuser@moodle.com', 'display' => core_user::MAILDISPLAY_EVERYONE,
-             'samecourse' => false, 'result' => false],
+            [   'email' => 'fromuser@moodle.com',
+                'display' => core_user::MAILDISPLAY_HIDE,
+                'samecourse' => false,
+                'config' => "example.com\r\ntest.com",
+                'result' => false
+            ],
+            // Test that from display is set to course members only (course member).
+            [   'email' => 'fromuser@moodle.com',
+                'display' => core_user::MAILDISPLAY_COURSE_MEMBERS_ONLY,
+                'samecourse' => true,
+                'config' => "example.com\r\ntest.com",
+                'result' => false
+            ],
+            // Test that from display is set to course members only (Non course member.
+            [   'email' => 'fromuser@moodle.com',
+                'display' => core_user::MAILDISPLAY_COURSE_MEMBERS_ONLY,
+                'samecourse' => false,
+                'config' => "example.com\r\ntest.com",
+                'result' => false
+            ],
+            // Test that from display is set to show everyone.
+            [   'email' => 'fromuser@moodle.com',
+                'display' => core_user::MAILDISPLAY_EVERYONE,
+                'samecourse' => false,
+                'config' => "example.com\r\ntest.com",
+                'result' => false
+            ],
+            // Test a few erroneous config value and confirm failure.
+            [   'email' => 'fromuser@moodle.com',
+                'display' => core_user::MAILDISPLAY_EVERYONE,
+                'samecourse' => false,
+                'config' => "\r\n   \r\n",
+                'result' => false
+            ],
+            [   'email' => 'fromuser@moodle.com',
+                'display' => core_user::MAILDISPLAY_EVERYONE,
+                'samecourse' => false,
+                'config' => " \n   \n \n ",
+                'result' => false
+            ],
         ];
     }
 
@@ -3455,11 +3579,11 @@ class core_moodlelib_testcase extends advanced_testcase {
 
         $CFG->maildomain = 'example.com';
         $CFG->mailprefix = 'mdl+';
-        $this->assertEquals(1, validate_email(generate_email_processing_address(0, $modargs)));
+        $this->assertTrue(validate_email(generate_email_processing_address(0, $modargs)));
 
         $CFG->maildomain = 'mail.example.com';
         $CFG->mailprefix = 'mdl-';
-        $this->assertEquals(1, validate_email(generate_email_processing_address(23, $modargs)));
+        $this->assertTrue(validate_email(generate_email_processing_address(23, $modargs)));
     }
 
     /**
@@ -3490,5 +3614,131 @@ class core_moodlelib_testcase extends advanced_testcase {
         // Array used in the grader report.
         $a = array('aggregatesonly' => [51, 34], 'gradesonly' => [21, 45, 78]);
         $this->assertEquals($a, unserialize_array(serialize($a)));
+    }
+
+    /**
+     * Test that the component_class_callback returns the correct default value when the class was not found.
+     *
+     * @dataProvider component_class_callback_default_provider
+     * @param $default
+     */
+    public function test_component_class_callback_not_found($default) {
+        $this->assertSame($default, component_class_callback('thisIsNotTheClassYouWereLookingFor', 'anymethod', [], $default));
+    }
+
+    /**
+     * Test that the component_class_callback returns the correct default value when the class was not found.
+     *
+     * @dataProvider component_class_callback_default_provider
+     * @param $default
+     */
+    public function test_component_class_callback_method_not_found($default) {
+        require_once(__DIR__ . '/fixtures/component_class_callback_example.php');
+
+        $this->assertSame($default, component_class_callback(test_component_class_callback_example::class, 'this_is_not_the_method_you_were_looking_for', ['abc'], $default));
+    }
+
+    /**
+     * Test that the component_class_callback returns the default when the method returned null.
+     *
+     * @dataProvider component_class_callback_default_provider
+     * @param $default
+     */
+    public function test_component_class_callback_found_returns_null($default) {
+        require_once(__DIR__ . '/fixtures/component_class_callback_example.php');
+
+        $this->assertSame($default, component_class_callback(test_component_class_callback_example::class, 'method_returns_value', [null], $default));
+        $this->assertSame($default, component_class_callback(test_component_class_callback_child_example::class, 'method_returns_value', [null], $default));
+    }
+
+    /**
+     * Test that the component_class_callback returns the expected value and not the default when there was a value.
+     *
+     * @dataProvider component_class_callback_data_provider
+     * @param $default
+     */
+    public function test_component_class_callback_found_returns_value($value) {
+        require_once(__DIR__ . '/fixtures/component_class_callback_example.php');
+
+        $this->assertSame($value, component_class_callback(test_component_class_callback_example::class, 'method_returns_value', [$value], 'This is not the value you were looking for'));
+        $this->assertSame($value, component_class_callback(test_component_class_callback_child_example::class, 'method_returns_value', [$value], 'This is not the value you were looking for'));
+    }
+
+    /**
+     * Test that the component_class_callback handles multiple params correctly.
+     *
+     * @dataProvider component_class_callback_multiple_params_provider
+     * @param $default
+     */
+    public function test_component_class_callback_found_accepts_multiple($params, $count) {
+        require_once(__DIR__ . '/fixtures/component_class_callback_example.php');
+
+        $this->assertSame($count, component_class_callback(test_component_class_callback_example::class, 'method_returns_all_params', $params, 'This is not the value you were looking for'));
+        $this->assertSame($count, component_class_callback(test_component_class_callback_child_example::class, 'method_returns_all_params', $params, 'This is not the value you were looking for'));
+    }
+
+    /**
+     * Data provider with list of default values for user in component_class_callback tests.
+     *
+     * @return array
+     */
+    public function component_class_callback_default_provider() {
+        return [
+            'null' => [null],
+            'empty string' => [''],
+            'string' => ['This is a string'],
+            'int' => [12345],
+            'stdClass' => [(object) ['this is my content']],
+            'array' => [['a' => 'b',]],
+        ];
+    }
+
+    /**
+     * Data provider with list of default values for user in component_class_callback tests.
+     *
+     * @return array
+     */
+    public function component_class_callback_data_provider() {
+        return [
+            'empty string' => [''],
+            'string' => ['This is a string'],
+            'int' => [12345],
+            'stdClass' => [(object) ['this is my content']],
+            'array' => [['a' => 'b',]],
+        ];
+    }
+
+    /**
+     * Data provider with list of default values for user in component_class_callback tests.
+     *
+     * @return array
+     */
+    public function component_class_callback_multiple_params_provider() {
+        return [
+            'empty array' => [
+                [],
+                0,
+            ],
+            'string value' => [
+                ['one'],
+                1,
+            ],
+            'string values' => [
+                ['one', 'two'],
+                2,
+            ],
+            'arrays' => [
+                [[], []],
+                2,
+            ],
+            'nulls' => [
+                [null, null, null, null],
+                4,
+            ],
+            'mixed' => [
+                ['a', 1, null, (object) [], []],
+                5,
+            ],
+        ];
     }
 }

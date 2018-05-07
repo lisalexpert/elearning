@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,18 +14,142 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/* Course Status Tracker Block
- * The plugin shows the number and list of enrolled courses and completed courses.
- * It also shows the number of courses which are in progress and whose completion criteria is undefined but the manger.
- * @package blocks
- * @author: Azmat Ullah, Talha Noor
+/**
+ * Block to display enrolled, completed, inprogress and undefined courses according to course
+ * completi  on criteria named 'grade' based on login user.
+ *
+ * @package    block_course_status_tracker
+ * @copyright  3i Logic<lms@3ilogic.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
 /**
- * This function count the total completed courses of any user
+ * This function return category id based on course id.
  *
- * @param int   $userid Variable
- * @return String $total_courses return total completed courses of any use.
+ * @param int   $id course id
+ * @return String category id.
+ */
+function get_category_id($course) {
+    global $DB;
+
+    $category_id_sql = "SELECT category FROM {course} where id = " . $course;
+    $category_id_rs = $DB->get_record_sql($category_id_sql, array());
+    if ($DB->record_exists_sql($category_id_sql, array())) {
+        return $category_id_rs->category;
+    }
+}
+
+/**
+ * This function display list of inprogress courses based on login user.
+ *
+ * @param int   $id user id
+ * @return Table table.
+ */
+function user_inprogress_courses_report($userid) {
+    global $CFG, $DB;
+
+    $courses = enrol_get_users_courses($userid, false, 'id, shortname, showgrades');
+    if ($courses) {
+        $undefined_courses = '';
+        $enroll_courses = '';
+        foreach ($courses as $course) {
+            $exist = $DB->record_exists('course_completion_criteria', array('course' => $course->id));
+            $enroll_courses .= $course->id . ",";
+            if (!$exist) {
+                $undefined_courses .= $course->id . ",";
+            }
+        }
+    }
+
+
+
+    $complete_course_sql = "SELECT course FROM {course_completion_crit_compl} where userid = " . $userid;
+    $complete_course_rs = $DB->get_records_sql($complete_course_sql, array());
+    if ($DB->record_exists_sql($complete_course_sql, array())) {
+        $complete_courses = '';
+        foreach ($complete_course_rs as $complete_course_log) {
+            $complete_courses .= $complete_course_log->course . ",";
+        }
+    }
+
+    $enrolled_courses = rtrim($enroll_courses, ',');
+    $comp_undefined_courses = rtrim($undefined_courses, ',') . "," . rtrim($complete_courses, ',');
+
+
+    $explode_enrolled_courses = explode(',', $enrolled_courses);
+    $enrolled_courses_array = array();
+    foreach ($explode_enrolled_courses as $explode_enroll) {
+        $enrolled_courses_array[] = $explode_enroll;
+    }
+
+
+    $explode_comp_undefined_courses = explode(',', $comp_undefined_courses);
+    $comp_undefined_courses_array = array();
+    foreach ($explode_comp_undefined_courses as $explode_comp_undefined_courses) {
+        $comp_undefined_courses_array[] = $explode_comp_undefined_courses;
+    }
+
+    $inprogress_courses = array_diff($enrolled_courses_array, $comp_undefined_courses_array);
+
+
+    $table = new html_table();
+    $table->attributes = array('class' => 'display');
+    $table->head = array(get_string('s_no', 'block_course_status_tracker'), get_string('module', 'block_course_status_tracker'), get_string('course_name', 'block_course_status_tracker'));
+    $table->align = array('center', 'left', 'left');
+    $table->data = array();
+    $i = 0;
+
+    foreach ($inprogress_courses as $course) {
+        $row = array();
+        $row[] = ++$i;
+        $row[] = module_name(get_category_id($course));
+        $row[] = "<a href=" . $CFG->wwwroot . "/course/view.php?id=" . $course . ">" . course_name($course) . "</a>";
+        $table->data[] = $row;
+    }
+
+    return $table;
+}
+
+/**
+ * This function display list of undefined courses based on login user.
+ *
+ * @param int   $id user id
+ * @return Table table.
+ */
+function user_undefined_courses_report($userid) {
+    global $CFG, $DB;
+
+    $courses = enrol_get_users_courses($userid, false, 'id, shortname, showgrades');
+    if ($courses) {
+        $table = new html_table();
+        $table->attributes = array('class' => 'display');
+        $table->head = array(get_string('s_no', 'block_course_status_tracker'), get_string('module', 'block_course_status_tracker'), get_string('course_name', 'block_course_status_tracker'));
+
+        $table->align = array('center', 'left', 'left');
+        $table->data = array();
+        $i = 0;
+
+        $course_criteria_ns = array();
+        static $undefined_courses;
+        foreach ($courses as $course) {
+            $exist = $DB->record_exists('course_completion_criteria', array('course' => $course->id));
+            if (!$exist) {
+                $row = array();
+                $row[] = ++$i;
+                $row[] = module_name($course->category);
+                $row[] = "<a href=" . $CFG->wwwroot . "/course/view.php?id=" . $course->id . ">" . course_name($course->id) . "</a>";
+                $table->data[] = $row;
+            }
+        }
+    }
+    return $table;
+}
+
+/**
+ * This function count completed course based on login user.
+ *
+ * @param int   $id user id
+ * @return String total course id.
  */
 function count_complete_course($userid) {
     global $DB;
@@ -36,11 +159,10 @@ function count_complete_course($userid) {
 }
 
 /**
- * This function retrun the total number of enrolled courses
+ * This function display list of enrolled courses based on login user.
  *
- * @see enrol_get_users_courses()
- * @param int   $userid Moodle user id 
- * @return String $count_course return total enrolled courses.
+ * @param int   $id user id
+ * @return Table table.
  */
 function user_enrolled_courses($userid) {
     global $CFG;
@@ -55,11 +177,10 @@ function user_enrolled_courses($userid) {
 }
 
 /**
- * This function tells how many enrolled courses criteria has not set yet of the user.
+ * This function returns total undefined courses based on login user.
  *
- * @see enrol_get_users_courses()
- * @param int   $userid Moodle user id
- * @return String $count return number that tells total undefined course criteria of course.
+ * @param int   $id user id
+ * @return String count number.
  */
 function count_course_criteria($userid) {
     global $DB;
@@ -79,10 +200,10 @@ function count_course_criteria($userid) {
 }
 
 /**
- * This function return the course category.
+ * This function return course category name based on course id.
  *
- * @param int   $id Moodle course id
- * @return String $module return category name of course.
+ * @param int   $id course id
+ * @return String category name.
  */
 function module_name($id) {
     global $DB;
@@ -92,10 +213,10 @@ function module_name($id) {
 }
 
 /**
- * This function return course name on the base of course id.
+ * This function returns course name based on course id.
  *
- * @param int   $course Moodle course id
- * @return String $course Moodle course name.
+ * @param int   $id course id
+ * @return String course name.
  */
 function course_name($id) {
     global $DB;
@@ -107,11 +228,10 @@ function course_name($id) {
 }
 
 /**
- * This function return user detail in the form of table.
+ * This function returns user details including user profile picture, name, department and joining date based on login user.
  *
- * @see report_get_custome_field($id, "Designation") This function return custom field Designation value on the bass userid
- * @param int   $id Moodle userid
- * @return String $table Moodle course name.
+ * @param int   $id user id
+ * @return Table table.
  */
 function user_details($id) {
     global $OUTPUT, $DB;
@@ -122,6 +242,13 @@ function user_details($id) {
     $user->picture = $OUTPUT->user_picture($user, array('size' => 100));
     // Fetch Data.
     $result = $DB->get_record_sql('SELECT concat(firstname," ",lastname) as name,department, timecreated as date  FROM {user} WHERE id = ?', array($id));
+
+    if ($result->date != '0') {
+        $date = userdate($result->date, get_string('strftimedate', 'core_langconfig'));
+    } else {
+        $date = "-";
+    }
+
     $table = '<table width="80%"><tr><td width="20%" style="vertical-align:middle;" rowspan="5">' . $user->picture . '</td></tr>
            <tr><td width="20%">' . get_string('name', 'block_course_status_tracker') . '</td><td>' . $result->name . '</td></tr>';
 
@@ -130,17 +257,16 @@ function user_details($id) {
         $table .='<tr><td>' . get_string('job_title', 'block_course_status_tracker') . '</td><td>' . format_string($check_designatino_field) . '</td></tr>';
     }
     $table .='<tr><td>' . get_string('department', 'block_course_status_tracker') . '</td><td>' . format_string($result->department) . '</td></tr>
-             <tr><td>' . get_string('joining_date', 'block_course_status_tracker') . '</td><td>' . userdate($result->date, get_string('strftimedate', 'core_langconfig')) . '</td></tr>
+             <tr><td>' . get_string('joining_date', 'block_course_status_tracker') . '</td><td>' . $date . '</td></tr>
              </table>';
     return $table;
 }
 
 /**
- * This function return the value of custom field on the base of parameter field name.
+ * This function returns custom field based on login user and field name.
  *
- * @param int    $userid Moodle userid
- * @param string $text custom field name
- * @return string Return field value.
+ * @param int   $id user id, $text field name
+ * @return String filed data.
  */
 function report_get_custome_field($userid, $text) {
     global $DB;
@@ -156,12 +282,10 @@ function report_get_custome_field($userid, $text) {
 }
 
 /**
- * This function return list of courses in which user enrolled.
+ * This function display list of enroled courses based on login user.
  *
- * @see module_name()
- * @enrol_get_users_courses
- * @param int    $userid Moodle userid
- * @return  Return table in which user can see the enrolled courses list.
+ * @param int   $id user id
+ * @return Table table.
  */
 function user_enrolled_courses_report($userid) {
     global $CFG;
@@ -169,9 +293,8 @@ function user_enrolled_courses_report($userid) {
     $courses = enrol_get_users_courses($userid, false, 'id, shortname, showgrades');
     if ($courses) {
         $table = new html_table();
+        $table->attributes = array('class' => 'display');
         $table->head = array(get_string('s_no', 'block_course_status_tracker'), get_string('module', 'block_course_status_tracker'), get_string('course_name', 'block_course_status_tracker'));
-        $table->size = array('20%', '35%', '50%');
-        $table->width = "80%";
 
         $table->align = array('center', 'left', 'left');
         $table->data = array();

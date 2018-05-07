@@ -18,8 +18,7 @@
 /**
 * Instance add/edit form
 *
-* @package    mod
-* @subpackage certificate
+* @package    mod_certificate
 * @copyright  Mark Nelson <markn@moodle.com>
 * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
@@ -29,7 +28,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 require_once ($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot.'/mod/certificate/lib.php');
+require_once($CFG->dirroot.'/mod/certificate/locallib.php');
 
 class mod_certificate_mod_form extends moodleform_mod {
 
@@ -48,7 +47,7 @@ class mod_certificate_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $this->add_intro_editor(false, get_string('intro', 'certificate'));
+        $this->standard_intro_elements(get_string('intro', 'certificate'));
 
         // Issue options
         $mform->addElement('header', 'issueoptions', get_string('issueoptions', 'certificate'));
@@ -92,7 +91,6 @@ class mod_certificate_mod_form extends moodleform_mod {
 
         $dateformatoptions = array( 1 => 'January 1, 2000', 2 => 'January 1st, 2000', 3 => '1 January 2000',
             4 => 'January 2000', 5 => get_string('userdateformat', 'certificate'));
-        $dateformatoptions[6] = '01/01/2000';
         $mform->addElement('select', 'datefmt', get_string('datefmt', 'certificate'), $dateformatoptions);
         $mform->setDefault('datefmt', 0);
         $mform->addHelpButton('datefmt', 'datefmt', 'certificate');
@@ -137,7 +135,7 @@ class mod_certificate_mod_form extends moodleform_mod {
 
         $orientation = array( 'L' => get_string('landscape', 'certificate'), 'P' => get_string('portrait', 'certificate'));
         $mform->addElement('select', 'orientation', get_string('orientation', 'certificate'), $orientation);
-        $mform->setDefault('orientation', 'landscape');
+        $mform->setDefault('orientation', 'L');
         $mform->addHelpButton('orientation', 'orientation', 'certificate');
 
         $mform->addElement('select', 'borderstyle', get_string('borderstyle', 'certificate'), certificate_get_images(CERT_IMAGE_BORDER));

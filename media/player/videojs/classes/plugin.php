@@ -75,6 +75,7 @@ class media_videojs_plugin extends core_media_player_native {
         // Currently Flash in VideoJS does not support responsive layout. If Flash is enabled try to guess
         // if HTML5 player will be engaged for the user and then set it to responsive.
         $responsive = (get_config('media_videojs', 'useflash') && !$this->youtube) ? null : true;
+        $flashtech = false;
 
         // Build list of source tags.
         foreach ($urls as $url) {
@@ -92,6 +93,9 @@ class media_videojs_plugin extends core_media_player_native {
             if ($responsive === null) {
                 $responsive = core_useragent::supports_html5($extension);
             }
+            if (!core_useragent::supports_html5($extension) && get_config('media_videojs', 'useflash')) {
+                $flashtech = true;
+            }
         }
         $sources = implode("\n", $sources);
 
@@ -104,6 +108,8 @@ class media_videojs_plugin extends core_media_player_native {
             $datasetup[] = '"sources": [{"type": "video/youtube", "src":"' . $urls[0] . '"}]';
             $sources = ''; // Do not specify <source> tags - it may confuse browser.
             $isaudio = false; // Just in case.
+        } else if ($flashtech) {
+            $datasetup[] = '"techOrder": ["flash", "html5"]';
         }
 
         // Add a language.
@@ -129,8 +135,13 @@ class media_videojs_plugin extends core_media_player_native {
         }
 
         // Attributes for the video/audio tag.
+        // We use data-setup-lazy as the attribute name for the config instead of
+        // data-setup because data-setup will cause video.js to load the player as soon as the library is loaded,
+        // which is BEFORE we have a chance to load any additional libraries (youtube).
+        // The data-setup-lazy is just a tag name that video.js does not recognise so we can manually initialise
+        // it when we are sure the dependencies are loaded.
         $attributes = [
-            'data-setup' => '{' . join(', ', $datasetup) . '}',
+            'data-setup-lazy' => '{' . join(', ', $datasetup) . '}',
             'id' => 'id_videojs_' . uniqid(),
             'class' => get_config('media_videojs', $isaudio ? 'audiocssclass' : 'videocssclass')
         ];

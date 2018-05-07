@@ -1065,8 +1065,9 @@
 			row:      rowIdx,
 			col:      colIdx
 		} );
-	
+	/*
 		if ( cellData === undefined ) {
+
 			if ( settings.iDrawError != draw && defaultContent === null ) {
 				_fnLog( settings, 0, "Requested unknown parameter "+
 					(typeof col.mData=='function' ? '{function}' : "'"+col.mData+"'")+
@@ -1075,7 +1076,7 @@
 			}
 			return defaultContent;
 		}
-	
+            */
 		/* When the data source is null, we can use default column data */
 		if ( (cellData === rowData || cellData === null) && defaultContent !== null ) {
 			cellData = defaultContent;

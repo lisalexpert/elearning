@@ -18,14 +18,14 @@
  * Version info.
  *
  * @package availability_language
- * @copyright 2014 Renaat Debleu (www.eWallah.net)
+ * @copyright 2018 Renaat Debleu (www.eWallah.net)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2014092000;
-$plugin->requires = 2014050800;
-$plugin->release = '2.7';
-$plugin->maturity = MATURITY_STABLE;
+$plugin->version   = 2018041802;
+$plugin->requires  = 2017111300;
 $plugin->component = 'availability_language';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = '3.4+';

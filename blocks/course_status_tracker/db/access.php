@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/* Course Status Tracker Block
- * The plugin shows the number and list of enrolled courses and completed courses.
- * It also shows the number of courses which are in progress and whose completion criteria is undefined but the manger.
- * @package blocks
- * @author: Azmat Ullah, Talha Noor
+/**
+ * Block to display enrolled, completed, inprogress and undefined courses according to course completion criteria named 'grade' based on login user.
+ *
+ * @package    block_course_status_tracker
+ * @copyright  3i Logic<lms@3ilogic.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
-
 defined('MOODLE_INTERNAL') || die();
 $capabilities = array(
     'block/course_status_tracker:myaddinstance' => array(
@@ -29,37 +29,29 @@ $capabilities = array(
         'archetypes' => array(
             'user' => CAP_ALLOW
         ),
-         'legacy' => array(
+        'legacy' => array(
             'guest' => CAP_PREVENT,
-        
         ),
- 
         'clonepermissionsfrom' => 'moodle/my:manageblocks'
     ),
- 
     'block/course_status_tracker:addinstance' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
- 
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
-            ),
+        ),
         'legacy' => array(
             'guest' => CAP_PREVENT,
-        
         ),
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
-        'block/course_status_tracker:view' => array(
+    'block/course_status_tracker:view' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
-            
-            'guest'        => CAP_PREVENT
-            
-            ),
- 
+            'guest' => CAP_PREVENT
         ),
+    ),
 );

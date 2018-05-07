@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,20 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Defines backup_glossary_activity_task class
+ *
  * @package mod_game
  * @subpackage backup-moodle2
- * class backup_game_activity_task 
- * @author 
- * @version $Id: backup_game_activity_task.class.php,v 1.2 2012/07/25 11:16:04 bdaloukas Exp $
- * @package game
+ * @copyright 2007 Vasilis Daloukas
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
-  
-require_once($CFG->dirroot . '/mod/game/backup/moodle2/backup_game_stepslib.php'); // Because it exists (must)
-require_once($CFG->dirroot . '/mod/game/backup/moodle2/backup_game_settingslib.php'); // Because it exists (optional)
- 
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/mod/game/backup/moodle2/backup_game_stepslib.php'); // Because it exists (must).
+
 /**
- * game backup task that provides all the settings and steps to perform one
- * complete backup of the activity
+ * Fame backup task that provides all the settings and steps to perform one complete backup of the activity
+ *
+ * @copyright 2007 Vasilis Daloukas
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_game_activity_task extends backup_activity_task {
 
@@ -37,34 +39,36 @@ class backup_game_activity_task extends backup_activity_task {
      * Define (add) particular settings this activity can have
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity.
     }
 
     /**
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // Game only has one structure step
-        $this->add_step(new backup_game_activity_structure_step('game_structure', 'game.xml'));        
+        // Game only has one structure step.
+        $this->add_step(new backup_game_activity_structure_step('game_structure', 'game.xml'));
     }
- 
+
     /**
-     * Code the transformations to perform in the activity in
-     * order to get transportable (encoded) links
+     * Encodes URLs to the index.php and view.php scripts
+     *
+     * @param string $content some HTML text that eventually contains URLs to the activity instance scripts
+     * @return string the content with the URLs encoded
      */
     static public function encode_content_links($content) {
         global $CFG;
- 
-        $base = preg_quote($CFG->wwwroot,"/");
- 
-        // Link to the list of gamess
-        $search="/(".$base."\/mod\/game\/index.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@GAMEINDEX*$2@$', $content);
- 
-        // Link to game view by moduleid
-        $search="/(".$base."\/mod\/game\/view.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@GAMEVIEWBYID*$2@$', $content);
- 
+
+        $base = preg_quote($CFG->wwwroot, "/");
+
+        // Link to the list of games.
+        $search = "/(".$base."\/mod\/game\/index.php\?id\=)([0-9]+)/";
+        $content = preg_replace($search, '$@GAMEINDEX*$2@$', $content);
+
+        // Link to game view by moduleid.
+        $search = "/(".$base."\/mod\/game\/view.php\?id\=)([0-9]+)/";
+        $content = preg_replace($search, '$@GAMEVIEWBYID*$2@$', $content);
+
         return $content;
     }
 }
