@@ -77,7 +77,7 @@ class theme_bootstrap_format_topics_renderer extends format_topics_renderer {
                 $previouslink .= html_writer::end_tag('div');
                 $previouslink .= html_writer::start_tag('span', array('class' => 'text'));
                 $previouslink .= html_writer::start_tag('span', array('class' => 'nav_guide'));
-                $previouslink .= get_string('previoussection', 'theme_essential');
+                $previouslink .= get_string('previoussection');
                 $previouslink .= html_writer::end_tag('span');
                 $previouslink .= html_writer::empty_tag('br');
                 $previouslink .= get_section_name($course, $sections[$back]);
@@ -99,7 +99,7 @@ class theme_bootstrap_format_topics_renderer extends format_topics_renderer {
                 $nextlink .= html_writer::end_tag('div');
                 $nextlink .= html_writer::start_tag('span', array('class' => 'text'));
                 $nextlink .= html_writer::start_tag('span', array('class' => 'nav_guide'));
-                $nextlink .= get_string('nextsection', 'theme_essential');
+                $nextlink .= get_string('nextsection');
                 $nextlink .= html_writer::end_tag('span');
                 $nextlink .= html_writer::empty_tag('br');
                 $nextlink .= get_section_name($course, $sections[$forward]);
