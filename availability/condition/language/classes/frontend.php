@@ -18,7 +18,7 @@
  * Front-end class.
  *
  * @package availability_language
- * @copyright 2014 Renaat Debleu (www.eWallah.net)
+ * @copyright 2018 Renaat Debleu (www.eWallah.net)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * Front-end class.
  *
  * @package availability_language
- * @copyright 2014 Renaat Debleu (www.eWallah.net)
+ * @copyright 2018 Renaat Debleu (www.eWallah.net)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class frontend extends \core_availability\frontend {
@@ -41,7 +41,7 @@ class frontend extends \core_availability\frontend {
      * @return array Array of required string identifiers
      */
     protected function get_javascript_strings() {
-        return array();
+        return [];
     }
 
     /**
@@ -49,29 +49,18 @@ class frontend extends \core_availability\frontend {
      *
      * Returns an array of array of id, name
      *
-     * @param \stdClass $course Course object
-     * @param \cm_info $cm Course-module currently being edited (null if none)
-     * @param \section_info $section Section currently being edited (null if none)
+     * @param stdClass $course Course object
+     * @param cm_info $cm Course-module currently being edited (null if none)
+     * @param section_info $section Section currently being edited (null if none)
      * @return array Array of parameters for the JavaScript function
      */
-    protected function get_javascript_init_params($course, \cm_info $cm = null,
-            \section_info $section = null) {
+    protected function get_javascript_init_params($course, \cm_info $cm = null, \section_info $section = null) {
         $langs = get_string_manager()->get_list_of_translations(false);
-        $jsarray = array();
+        $jsarray = [];
         foreach ($langs as $key => $value) {
-            $jsarray[] = (object)array('id' => $key, 'name' => $value);
+            $jsarray[] = (object)['id' => $key, 'name' => $value];
         }
-        return array($jsarray);
-    }
-
-    /**
-     * Gets all languages for the given course.
-     *
-     * @param int $courseid Course id
-     * @return array Array of all the language objects
-     */
-    protected function get_all_languages($courseid) {
-        return get_string_manager()->get_list_of_translations(false);
+        return [$jsarray];
     }
 
     /**
@@ -79,12 +68,12 @@ class frontend extends \core_availability\frontend {
      *     the course language is not forced, or
      *     more than language is installed.
      *
-     * @param \stdClass $course Course object
-     * @param \cm_info $cm Course-module currently being edited (null if none)
-     * @param \section_info $section Section currently being edited (null if none)
+     * @param stdClass $course Course object
+     * @param cm_info $cm Course-module currently being edited (null if none)
+     * @param section_info $section Section currently being edited (null if none)
+     * @return bool True if available
      */
-    protected function allow_add($course, \cm_info $cm = null,
-            \section_info $section = null) {
+    protected function allow_add($course, \cm_info $cm = null, \section_info $section = null) {
         // If forced course language.
         if ($course->lang != '') {
             return false;

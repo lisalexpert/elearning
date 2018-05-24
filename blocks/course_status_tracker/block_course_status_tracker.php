@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,11 +13,14 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-/* Course Status Tracker Block
- * The plugin shows the number and list of enrolled courses and completed courses.
- * It also shows the number of courses which are in progress and whose completion criteria is undefined but the manger.
- * @package blocks
- * @author: Azmat Ullah, Talha Noor
+
+/**
+ * Block to display enrolled, completed, inprogress and undefined courses according to course
+ * completion criteria named 'grade' based on login user.
+ *
+ * @package    block_course_status_tracker
+ * @copyright  3i Logic<lms@3ilogic.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 require_once('lib.php');
 
@@ -79,15 +81,18 @@ class block_course_status_tracker extends block_base {
             $courses = enrol_get_users_courses($USER->id, false, 'id, shortname, showgrades');
             if ($courses) {
                 $course_criteria_ns = array();
+                static $undefined_courses;
                 foreach ($courses as $course) {
                     $exist = $DB->record_exists('course_completion_criteria', array('course' => $course->id));
                     if (!$exist) {
                         $count++;
                         $course_criteria_ns[] = $course->id;
+                        $undefined_courses .= $course->id . ",";
                     }
                 }
             }
             $course_criteria_not_set = $count;
+
             // End course criteria.
             // Course inprogress
             $count_inprogress_courses = abs(($enrolled_courses) - ($count_complete_courses + $course_criteria_not_set));
@@ -103,14 +108,38 @@ class block_course_status_tracker extends block_base {
             } else {
                 $link_count_complete_courses = $count_complete_courses;
             }
-            $link_course_criteria_not_set = "<a href='" . $CFG->wwwroot . "/blocks/course_status_tracker/view.php?viewpage=1'>" .
-                    $course_criteria_not_set . "</a>";
-            $link_count_inprogress_courses = "<a href='" . $CFG->wwwroot . "/blocks/course_status_tracker/view.php?viewpage=1'>" .
-                    $count_inprogress_courses . "</a>";
+
+
+
+
+
+
+
+
+
+            if ($course_criteria_not_set > 0) {
+                $link_course_criteria_not_set = "<u><a href='" . $CFG->wwwroot . "/blocks/course_status_tracker/view.php?viewpage=3'>" .
+                        $course_criteria_not_set . "</a></u>";
+            } else {
+                $link_course_criteria_not_set = $course_criteria_not_set;
+            }
+
+
+
+
+
+            if ($count_inprogress_courses > 0) {
+                $link_count_inprogress_courses = "<u><a href='" . $CFG->wwwroot . "/blocks/course_status_tracker/view.php?viewpage=4'>" .
+                        $count_inprogress_courses . "</a></u>";
+            } else {
+                $link_count_inprogress_courses = $count_inprogress_courses;
+            }
+
+            $this->content->text = '';
             $this->content->text .= get_string('enrolled_courses', 'block_course_status_tracker') . " :	<b>" . $link_enrolled_courses . "</b><br>";
             $this->content->text .= get_string('completed_courses', 'block_course_status_tracker') . " : <b>" . $link_count_complete_courses . "</b><br>";
-            $this->content->text .= get_string('inprogress_courses', 'block_course_status_tracker') . " : <b>" . $count_inprogress_courses . "</b><br>";
-            $this->content->text .= get_string('undefined_coursecriteria', 'block_course_status_tracker') . " : <b>" . $course_criteria_not_set . "</b><br>";
+            $this->content->text .= get_string('inprogress_courses', 'block_course_status_tracker') . " : <b>" . $link_count_inprogress_courses . "</b><br>";
+            $this->content->text .= get_string('undefined_coursecriteria', 'block_course_status_tracker') . " : <b>" . $link_course_criteria_not_set . "</b><br>";
         } else {
             $this->content->text .= get_string('coursecompletion_setting', 'block_course_status_tracker');
         }

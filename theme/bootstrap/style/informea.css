@@ -431,4 +431,9 @@ label{
     vertical-align: text-bottom;
 }
 
-
+.req > img.icon {
+	margin-right: 0;
+	width: auto;
+	height: auto;
+	vertical-align: top;
+}

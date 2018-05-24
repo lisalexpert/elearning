@@ -103,7 +103,12 @@ function lti_get_launch_data($instance) {
         if ($tool) {
             $typeid = $tool->id;
         } else {
-            $typeid = null;
+            $tool = lti_get_tool_by_url_match($instance->securetoolurl,  $instance->course);
+            if ($tool) {
+                $typeid = $tool->id;
+            } else {
+                $typeid = null;
+            }
         }
     } else {
         $typeid = $instance->typeid;
@@ -386,15 +391,15 @@ function lti_build_request($instance, $typeconfig, $course, $typeid = null, $isl
         'lis_person_sourcedid' => $USER->idnumber,
         'roles' => $role,
         'context_id' => $course->id,
-        'context_label' => $course->shortname,
-        'context_title' => $course->fullname,
+        'context_label' => trim(html_to_text($course->shortname, 0)),
+        'context_title' => trim(html_to_text($course->fullname, 0)),
     );
     if (!empty($instance->name)) {
-        $requestparams['resource_link_title'] = $instance->name;
+        $requestparams['resource_link_title'] = trim(html_to_text($instance->name, 0));
     }
     if (!empty($instance->cmid)) {
         $intro = format_module_intro('lti', $instance, $instance->cmid);
-        $intro = html_to_text($intro, 0, false);
+        $intro = trim(html_to_text($intro, 0, false));
 
         // This may look weird, but this is required for new lines
         // so we generate the same OAuth signature as the tool provider.
@@ -445,7 +450,7 @@ function lti_build_request($instance, $typeconfig, $course, $typeid = null, $isl
     ) {
         $requestparams['lis_person_name_given'] = $USER->firstname;
         $requestparams['lis_person_name_family'] = $USER->lastname;
-        $requestparams['lis_person_name_full'] = $USER->firstname . ' ' . $USER->lastname;
+        $requestparams['lis_person_name_full'] = fullname($USER);
         $requestparams['ext_user_username'] = $USER->username;
     }
 
@@ -531,11 +536,11 @@ function lti_build_standard_request($instance, $orgid, $islti2, $messagetype = '
         $requestparams["tool_consumer_instance_guid"] = $orgid;
     }
     if (!empty($CFG->mod_lti_institution_name)) {
-        $requestparams['tool_consumer_instance_name'] = $CFG->mod_lti_institution_name;
+        $requestparams['tool_consumer_instance_name'] = trim(html_to_text($CFG->mod_lti_institution_name, 0));
     } else {
         $requestparams['tool_consumer_instance_name'] = get_site()->shortname;
     }
-    $requestparams['tool_consumer_instance_description'] = get_site()->fullname;
+    $requestparams['tool_consumer_instance_description'] = trim(html_to_text(get_site()->fullname, 0));
 
     return $requestparams;
 }
@@ -562,11 +567,9 @@ function lti_build_custom_parameters($toolproxy, $tool, $instance, $params, $cus
     if ($customstr) {
         $custom = lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $islti2);
     }
-    if (!isset($typeconfig['allowinstructorcustom']) || $typeconfig['allowinstructorcustom'] != LTI_SETTING_NEVER) {
-        if ($instructorcustomstr) {
-            $custom = array_merge(lti_split_custom_parameters($toolproxy, $tool, $params,
-                $instructorcustomstr, $islti2), $custom);
-        }
+    if ($instructorcustomstr) {
+        $custom = array_merge(lti_split_custom_parameters($toolproxy, $tool, $params,
+            $instructorcustomstr, $islti2), $custom);
     }
     if ($islti2) {
         $custom = array_merge(lti_split_custom_parameters($toolproxy, $tool, $params,
@@ -889,12 +892,7 @@ function lti_tool_configuration_from_content_item($typeid, $messagetype, $ltiver
         }
         if (isset($item->url)) {
             $url = new moodle_url($item->url);
-            // Assign item URL to securetoolurl or toolurl depending on its scheme.
-            if (strtolower($url->get_scheme()) === 'https') {
-                $config->securetoolurl = $url->out(false);
-            } else {
-                $config->toolurl = $url->out(false);
-            }
+            $config->toolurl = $url->out(false);
             $config->typeid = 0;
         } else {
             $config->typeid = $typeid;
@@ -1131,6 +1129,9 @@ EOD;
  * @return Array of enabled capabilities
  */
 function lti_get_enabled_capabilities($tool) {
+    if (!isset($tool)) {
+        return array();
+    }
     if (!empty($tool->enabledcapability)) {
         $enabledcapabilities = explode("\n", $tool->enabledcapability);
     } else {
@@ -1165,7 +1166,7 @@ function lti_get_enabled_capabilities($tool) {
  * @param string    $customstr      String containing the parameters
  * @param boolean   $islti2         True if an LTI 2 tool is being launched
  *
- * @return Array of custom parameters
+ * @return array of custom parameters
  */
 function lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $islti2 = false) {
     $customstr = str_replace("\r\n", "\n", $customstr);
@@ -1179,11 +1180,12 @@ function lti_split_custom_parameters($toolproxy, $tool, $params, $customstr, $is
             continue;
         }
         $key = trim(core_text::substr($line, 0, $pos));
+        $key = lti_map_keyname($key, false);
         $val = trim(core_text::substr($line, $pos + 1, strlen($line)));
         $val = lti_parse_custom_parameter($toolproxy, $tool, $params, $val, $islti2);
         $key2 = lti_map_keyname($key);
         $retval['custom_'.$key2] = $val;
-        if ($islti2 && ($key != $key2)) {
+        if ($key != $key2) {
             $retval['custom_'.$key] = $val;
         }
     }
@@ -1247,6 +1249,8 @@ function lti_parse_custom_parameter($toolproxy, $tool, $params, $value, $islti2)
                             $value = str_replace('<br>' , ' ', $value);
                             $value = format_string($value);
                         }
+                    } else {
+                        $value = lti_calculate_custom_parameter($value1);
                     }
                 } else if ($islti2) {
                     $val = $value;
@@ -1266,17 +1270,36 @@ function lti_parse_custom_parameter($toolproxy, $tool, $params, $value, $islti2)
 }
 
 /**
+ * Calculates the value of a custom parameter that has not been specified earlier
+ *
+ * @param string    $value          Custom parameter value
+ *
+ * @return string Calculated value of custom parameter
+ */
+function lti_calculate_custom_parameter($value) {
+    global $USER, $COURSE;
+
+    switch ($value) {
+        case 'Moodle.Person.userGroupIds':
+            return implode(",", groups_get_user_groups($COURSE->id, $USER->id)[0]);
+    }
+    return null;
+}
+
+/**
  * Used for building the names of the different custom parameters
  *
  * @param string $key   Parameter name
- *
+ * @param bool $tolower Do we want to convert the key into lower case?
  * @return string       Processed name
  */
-function lti_map_keyname($key) {
+function lti_map_keyname($key, $tolower = true) {
     $newkey = "";
-    $key = core_text::strtolower(trim($key));
+    if ($tolower) {
+        $key = core_text::strtolower(trim($key));
+    }
     foreach (str_split($key) as $ch) {
-        if ( ($ch >= 'a' && $ch <= 'z') || ($ch >= '0' && $ch <= '9') ) {
+        if ( ($ch >= 'a' && $ch <= 'z') || ($ch >= '0' && $ch <= '9') || (!$tolower && ($ch >= 'A' && $ch <= 'Z'))) {
             $newkey .= $ch;
         } else {
             $newkey .= '_';
@@ -1302,9 +1325,9 @@ function lti_get_ims_role($user, $cmid, $courseid, $islti2) {
         // If no cmid is passed, check if the user is a teacher in the course
         // This allows other modules to programmatically "fake" a launch without
         // a real LTI instance.
-        $coursecontext = context_course::instance($courseid);
+        $context = context_course::instance($courseid);
 
-        if (has_capability('moodle/course:manageactivities', $coursecontext, $user)) {
+        if (has_capability('moodle/course:manageactivities', $context, $user)) {
             array_push($roles, 'Instructor');
         } else {
             array_push($roles, 'Learner');
@@ -1319,7 +1342,9 @@ function lti_get_ims_role($user, $cmid, $courseid, $islti2) {
         }
     }
 
-    if (is_siteadmin($user)) {
+    if (is_siteadmin($user) || has_capability('mod/lti:admin', $context)) {
+        // Make sure admins do not have the Learner role, then set admin role.
+        $roles = array_diff($roles, array('Learner'));
         if (!$islti2) {
             array_push($roles, 'urn:lti:sysrole:ims/lis/Administrator', 'urn:lti:instrole:ims/lis/Administrator');
         } else {
@@ -2359,7 +2384,7 @@ function lti_get_launch_container($lti, $toolconfig) {
 
 function lti_request_is_using_ssl() {
     global $CFG;
-    return (stripos($CFG->httpswwwroot, 'https://') === 0);
+    return (stripos($CFG->wwwroot, 'https://') === 0);
 }
 
 function lti_ensure_url_is_https($url) {
@@ -2520,7 +2545,13 @@ function lti_get_capabilities() {
     $capabilities = array(
        'basic-lti-launch-request' => '',
        'ContentItemSelectionRequest' => '',
+       'ToolProxyRegistrationRequest' => '',
        'Context.id' => 'context_id',
+       'Context.title' => 'context_title',
+       'Context.label' => 'context_label',
+       'Context.sourcedId' => 'lis_course_section_sourcedid',
+       'Context.longDescription' => '$COURSE->summary',
+       'Context.timeFrame.begin' => '$COURSE->startdate',
        'CourseSection.title' => 'context_title',
        'CourseSection.label' => 'context_label',
        'CourseSection.sourcedId' => 'lis_course_section_sourcedid',
@@ -2546,7 +2577,8 @@ function lti_get_capabilities() {
        'Person.webaddress' => '$USER->url',
        'Membership.role' => 'roles',
        'Result.sourcedId' => 'lis_result_sourcedid',
-       'Result.autocreate' => 'lis_outcome_service_url');
+       'Result.autocreate' => 'lis_outcome_service_url',
+       'Moodle.Person.userGroupIds' => null);
 
     return $capabilities;
 
@@ -2673,7 +2705,7 @@ function get_tool_type_icon_url(stdClass $type) {
     }
 
     if (empty($iconurl)) {
-        $iconurl = $OUTPUT->pix_url('icon', 'lti')->out();
+        $iconurl = $OUTPUT->image_url('icon', 'lti')->out();
     }
 
     return $iconurl;
@@ -2754,7 +2786,7 @@ function get_tool_proxy_urls(stdClass $proxy) {
     global $OUTPUT;
 
     $urls = array(
-        'icon' => $OUTPUT->pix_url('icon', 'lti')->out(),
+        'icon' => $OUTPUT->image_url('icon', 'lti')->out(),
         'edit' => get_tool_proxy_edit_url($proxy),
     );
 
@@ -3010,6 +3042,15 @@ function lti_load_type_from_cartridge($url, $type) {
         $toolinfo['lti_secureicon'] = $toolinfo['lti_extension_secureicon'];
     }
     unset($toolinfo['lti_extension_secureicon']);
+
+    // Ensure Custom icons aren't overridden by cartridge params.
+    if (!empty($type->lti_icon)) {
+        unset($toolinfo['lti_icon']);
+    }
+
+    if (!empty($type->lti_secureicon)) {
+        unset($toolinfo['lti_secureicon']);
+    }
 
     foreach ($toolinfo as $property => $value) {
         $type->$property = $value;

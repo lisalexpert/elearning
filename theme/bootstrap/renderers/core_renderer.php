@@ -253,7 +253,7 @@ class theme_bootstrap_core_renderer extends core_renderer {
             $branch = $menu->add($branchlabel, $branchurl, $branchtitle, $branchsort);
  			$branch->add('<i class="fa fa-user"></i>'.get_string('profile').'',new moodle_url('/user/profile.php'),get_string('profile'));
  			$branch->add('<i class="fa fa-calendar"></i>'.get_string('pluginname', 'block_calendar_month').'',new moodle_url('/calendar/view.php'),get_string('pluginname', 'block_calendar_month'));
- 			$branch->add('<i class="fa fa-envelope"></i>'.get_string('pluginname', 'block_messages').'',new moodle_url('/message/index.php'),get_string('pluginname', 'block_messages'));
+ 			$branch->add('<i class="fa fa-envelope"></i>'.get_string('messages', 'message').'',new moodle_url('/message/index.php'),get_string('messages', 'message'));
  			// $branch->add('<i class="fa fa-certificate"></i>'.get_string('badges').'',new moodle_url('/badges/mybadges.php'),get_string('badges'));
  			$branch->add('<i class="fa fa-file"></i>'.get_string('privatefiles', 'block_private_files').'',new moodle_url('/user/files.php'),get_string('privatefiles', 'block_private_files'));
  			// $branch->add('<i class="fa fa-sign-out"></i>'.get_string('logout').'',new moodle_url('/login/logout.php'),get_string('logout'));    

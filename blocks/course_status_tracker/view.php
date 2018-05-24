@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,12 +13,15 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-/* Course Status Tracker Block
- * The plugin shows the number and list of enrolled courses and completed courses.
- * It also shows the number of courses which are in progress and whose completion criteria is undefined but the manger.
- * @package blocks
- * @author: Azmat Ullah, Talha Noor
+
+/**
+ * Block to display enrolled, completed, inprogress and undefined courses according to course completion criteria named 'grade' based on login user.
+ *
+ * @package    block_course_status_tracker
+ * @copyright  3i Logic<lms@3ilogic.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
+ 
 require_once('../../config.php');
 require_once('course_form.php');
 require_once('lib.php');
@@ -36,6 +38,42 @@ $PAGE->set_url($pageurl);
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string("pluginname", 'block_course_status_tracker'));
 echo $OUTPUT->header();
+?>
+
+<!-- DataTables code starts-->
+<link rel="stylesheet" type="text/css" href="<?php echo $CFG->wwwroot ?>/blocks/course_status_tracker/public/datatable/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="<?php echo $CFG->wwwroot ?>/blocks/course_status_tracker/public/datatable/dataTables.tableTools.css">
+<script type="text/javascript" language="javascript" src="<?php echo $CFG->wwwroot ?>/blocks/course_status_tracker/public/datatable/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="<?php echo $CFG->wwwroot ?>/blocks/course_status_tracker/public/datatable/jquery.dataTables.js"></script>
+<script type="text/javascript" language="javascript" src="<?php echo $CFG->wwwroot ?>/blocks/course_status_tracker/public/datatable/dataTables.tableTools.js"></script>
+<script type="text/javascript" language="javascript" class="init">
+    $(document).ready(function () {
+        // fn for automatically adjusting table coulmns
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $($.fn.dataTable.tables(true)).DataTable()
+                    .columns.adjust();
+        });
+
+        $('.display').DataTable({
+            dom: 'T<"clear">lfrtip',
+            tableTools: {
+                "aButtons": [
+                    "copy",
+                    "print",
+                    {
+                        "sExtends": "collection",
+                        "sButtonText": "Save",
+                        "aButtons": ["xls", "pdf"]
+                    }
+                ],
+                "sSwfPath": "<?php echo $CFG->wwwroot ?>/blocks/course_status_tracker/public/datatable/copy_csv_xls_pdf.swf"
+            }
+        });
+    });
+</script>
+<!-- DataTables code ends-->
+
+<?php
 if ($viewpage == 1) {
     $form = new course_status_form();
     $table = $form->display_report();
@@ -46,7 +84,7 @@ if ($viewpage == 1) {
         $title.=user_details($USER->id);
         $a = html_writer::table($table);
         echo $title;
-        echo $a;
+        echo "<br/>".$a;
         echo "</div>";
     }
 } else if ($viewpage == 2) {
@@ -56,24 +94,23 @@ if ($viewpage == 1) {
     $title.=user_details($USER->id);
     echo $title;
     $a = html_writer::table(user_enrolled_courses_report($USER->id));
-    echo $a;
+    echo "<br/>".$a;
     echo "</div>";
 } else if ($viewpage == 3) {
     echo "<div id='prints'>";
-    // $title = '<center><table width="80%" style="background-color:#EEE;"><tr><td><center><h2>' . get_string('report_courseenrollment', 'block_course_status_tracker') . '</h2></center></td></tr></tr><table></center>';
-    $title = '<h2>' . get_string('report_courseenrollment', 'block_course_status_tracker') . '</h2>';
+    $title = '<h2>' . get_string('report_courseundefined', 'block_course_status_tracker') . '</h2>';
     $title.=user_details($USER->id);
     echo $title;
-    echo html_writer::table(user_enrolled_courses_report($USER->id));
+	echo "<br/>".html_writer::table(user_undefined_courses_report($USER->id));
     echo "</div>";
 } else if ($viewpage == 4) {
     echo "<div id='prints'>";
-    // $title = '<center><table width="100%" style="background-color:#EEE;"><tr><td><center><h2>' . get_string('report_courseenrollment', 'block_course_status_tracker') . '</h2></center></td></tr></tr><table></center>';
-    $title = '<h2>' . get_string('report_courseenrollment', 'block_course_status_tracker') . '</h2>';
+    $title = '<h2>' . get_string('report_courseinprogress', 'block_course_status_tracker') . '</h2>';
     $title.=user_details($USER->id);
     echo $title;
-    echo html_writer::table(user_enrolled_courses_report($USER->id));
+	echo "<br/>".html_writer::table(user_inprogress_courses_report($USER->id));
     echo "</div>";
-} else
+} 
+else
     header($CFG->wwwroot);
 echo $OUTPUT->footer();
