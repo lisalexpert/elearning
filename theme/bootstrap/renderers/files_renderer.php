@@ -105,6 +105,9 @@ class theme_bootstrap_core_files_renderer extends core_files_renderer {
                 <div class="fp-btn-download">
                     <a role="button" title="'.$strdownload.'" href="#"><img src="'.$this->pix_url('a/download_all').'" alt="" /></a>
                 </div>
+                <span class="fp-img-downloading">
+                    ' . $this->pix_icon('i/loading_small', '') . '
+                </span>
             </div>
             <div class="fp-viewbar">
                 <a title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons" href="#">
@@ -628,6 +631,12 @@ class theme_bootstrap_core_files_renderer extends core_files_renderer {
                 </div>
                 <div class="fp-linktype-4 form-group">
                     <label class="control-label col-md-4">'.get_string('makefilereference', 'repository').'</label>
+                    <div class="controls col-md-8">
+                        <input type="radio"/>
+                    </div>
+                </div>
+                <div class="fp-linktype-8 form-group">
+                    <label class="control-label col-md-4">'.get_string('makefilecontrolledlink', 'repository').'</label>
                     <div class="controls col-md-8">
                         <input type="radio"/>
                     </div>
