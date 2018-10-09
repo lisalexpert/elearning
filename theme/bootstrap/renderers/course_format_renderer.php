@@ -88,25 +88,28 @@ class theme_bootstrap_format_topics_renderer extends format_topics_renderer {
         }
 
         $forward = $sectionno + 1;
-        while ($forward <= $course->numsections and empty($links['next'])) {
-            if ($canviewhidden || $sections[$forward]->uservisible) {
-                $params = array('id' => 'next_section');
-                if (!$sections[$forward]->visible) {
-                    $params = array('class' => 'dimmed_text');
+        if (isset($course->numsections))
+        {
+            while ($forward <= $course->numsections and empty($links['next'])) {
+                if ($canviewhidden || $sections[$forward]->uservisible) {
+                    $params = array('id' => 'next_section');
+                    if (!$sections[$forward]->visible) {
+                        $params = array('class' => 'dimmed_text');
+                    }
+                    $nextlink = html_writer::start_tag('div', array('class' => 'nav_icon'));
+                    $nextlink .= $nextarrow;
+                    $nextlink .= html_writer::end_tag('div');
+                    $nextlink .= html_writer::start_tag('span', array('class' => 'text'));
+                    $nextlink .= html_writer::start_tag('span', array('class' => 'nav_guide'));
+                    $nextlink .= get_string('nextsection');
+                    $nextlink .= html_writer::end_tag('span');
+                    $nextlink .= html_writer::empty_tag('br');
+                    $nextlink .= get_section_name($course, $sections[$forward]);
+                    $nextlink .= html_writer::end_tag('span');
+                    $links['next'] = html_writer::link(course_get_url($course, $forward), $nextlink, $params);
                 }
-                $nextlink = html_writer::start_tag('div', array('class' => 'nav_icon'));
-                $nextlink .= $nextarrow;
-                $nextlink .= html_writer::end_tag('div');
-                $nextlink .= html_writer::start_tag('span', array('class' => 'text'));
-                $nextlink .= html_writer::start_tag('span', array('class' => 'nav_guide'));
-                $nextlink .= get_string('nextsection');
-                $nextlink .= html_writer::end_tag('span');
-                $nextlink .= html_writer::empty_tag('br');
-                $nextlink .= get_section_name($course, $sections[$forward]);
-                $nextlink .= html_writer::end_tag('span');
-                $links['next'] = html_writer::link(course_get_url($course, $forward), $nextlink, $params);
+                $forward++;
             }
-            $forward++;
         }
 
         return $links;

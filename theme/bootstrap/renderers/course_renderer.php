@@ -596,7 +596,10 @@ if ( url.match("#") ) {
           
           $dom = new DOMDocument();
           $coursecontext = context_course::instance($course->id);
-          $summary = file_rewrite_pluginfile_urls(format_text($course->summary,FORMAT_HTML,array('para'=>false)), 'pluginfile.php', $coursecontext->id, 'course', 'summary', null);
+          
+          $summary = file_rewrite_pluginfile_urls($course->summary, 'pluginfile.php', $coursecontext->id, 'course', 'summary', null);
+          $summary = format_text($summary,FORMAT_HTML,array('para'=>false));
+          
           $dom->loadHTML('<?xml encoding="utf-8" ?>' . $summary);
           $classname = 'course_summary_flyer';
           $a = new DOMXPath($dom);

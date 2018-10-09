@@ -24,7 +24,7 @@ class auth_plugin_googleoauth2 extends auth_plugin_base {
     /**
      * Constructor.
      */
-    function auth_plugin_googleoauth2() {
+    function __construct() {
         $this->authtype = 'googleoauth2';
         $this->roleauth = 'auth_googleoauth2';
         $this->errorlogtag = '[AUTH GOOGLEOAUTH2] ';

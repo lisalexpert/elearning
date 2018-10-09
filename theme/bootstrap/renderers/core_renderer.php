@@ -210,7 +210,12 @@ class theme_bootstrap_core_renderer extends core_renderer {
 		
     	$hasdisplaymycourses = true;//(empty($this->page->theme->settings->displaymycourses)) ? false : $this->page->theme->settings->displaymycourses;
         if (isloggedin() && !isguestuser() && $hasdisplaymycourses) {
-        	$mycoursetitle = $this->page->theme->settings->mycoursetitle;
+        	$mycoursetitle = "";
+        	if (isset($this->page->theme->settings->mycoursetitle))
+        	{
+                $mycoursetitle = $this->page->theme->settings->mycoursetitle;    
+        	}
+        	
             if ($mycoursetitle == 'module') {
 				$branchtitle = get_string('mymodules', 'theme_bootstrap');
 			} else if ($mycoursetitle == 'unit') {
@@ -580,7 +585,13 @@ class theme_bootstrap_core_renderer extends core_renderer {
         return html_writer::tag($tag, $content, $attributes);
     }
 	public function page_heading($tag = 'h1') {
-        return parent::page_heading($tag). html_writer::tag('div', format_text($this->page->course->summary,FORMAT_HTML,array('para'=>false)), array('id' => 'fpCourseSummary'));
+	    $coursecontext = context_course::instance($this->page->course->id);
+	    $summary = file_rewrite_pluginfile_urls($this->page->course->summary, 'pluginfile.php', $coursecontext->id, 'course', 'summary', null);
+        $summary = format_text($summary,FORMAT_HTML,array('para'=>false));
+	    
+// 	    $summary = format_text($this->page->course->summary,FORMAT_HTML,array('para'=>false));
+	    
+        return parent::page_heading($tag). html_writer::tag('div', $summary, array('id' => 'fpCourseSummary'));
     }
 	public function home_link() {
         global $CFG, $SITE;

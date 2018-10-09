@@ -80,6 +80,8 @@ class block_socialshare extends block_base {
         if ($enablegoogleplus) {
             $googleplusshare = $this->get_googleplus_share($url);
         }
+        
+        $stumbleuponshare = "";
         if ($enablestumbleupon) {
             $stumbleuponshare = $this->get_stumbleupon_share($url);
         }

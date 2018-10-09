@@ -26,7 +26,7 @@
                     <a title="Visit United Nations Institute for Training and Research website" href="http://www.unitar.org/" target="_blank" class="sprite-logo unitar">UNITAR</a>
                 </li>
                 <li class="pull-right">
-                    <a title="Visit European Commission website" href="http://ec.europa.eu" target="_blank" class="eu-logo"><img width="88" height="60" src="<?php echo $OUTPUT->pix_url('eu_logo_footer_color','theme') ?>"><br>European Union</a>
+                    <a title="Visit European Commission website" href="http://ec.europa.eu" target="_blank" class="eu-logo"><img width="88" height="60" src="<?php echo $OUTPUT->image_url('eu_logo_footer_color','theme') ?>"><br>European Union</a>
                 </li>
             </ul>
         </div>
