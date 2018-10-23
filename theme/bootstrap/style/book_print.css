@@ -1,0 +1,34 @@
+.book-print-logo-text {
+    font-size: 8px;
+    float: left;
+    margin-left: 15px;
+    line-height: 8px;
+    color: #fff !important;
+    
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+}
+
+.book-print-logo-text a {
+    font-weight: bold;
+    color: #fff !important;
+    
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+}
+
+.book-print-headerbar {
+    background-color: #0099D5 !important;
+    color: #fff !important;
+    padding: 5px;
+    border-radius: 5px;
+    
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+}
+
+body {
+  -webkit-print-color-adjust:exact;
+  color-adjust: exact;
+}
+
