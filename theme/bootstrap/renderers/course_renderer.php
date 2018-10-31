@@ -618,12 +618,12 @@ if ( url.match("#") ) {
             $span = $spans->item($i);
             $span->parentNode->removeChild($span);
           }
-          /* if($GLOBALS['categoryid']){
+          if($GLOBALS['categoryid']){
             $summary = $dom->saveHTML($dom->documentElement);
             $coursescontent .= html_writer::start_tag('div',array('class'=>'categ-summary'));
             $coursescontent .= $summary;
             $coursescontent .= html_writer::end_tag('div');
-          } */
+          }
           unset($dom);
           unset($spans);
           unset($a);

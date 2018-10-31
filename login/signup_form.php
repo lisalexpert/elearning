@@ -35,26 +35,6 @@ class login_signup_form extends moodleform implements renderable, templatable {
 
         $mform = $this->_form;
 
-        $mform->addElement('header', 'createuserandpass', get_string('createuserandpass'), '');
-
-
-        $mform->addElement('text', 'username', get_string('username'), 'maxlength="100" size="12" autocapitalize="none"');
-        $mform->setType('username', PARAM_RAW);
-        $mform->addRule('username', get_string('missingusername'), 'required', null, 'client');
-
-        if (!empty($CFG->passwordpolicy)){
-            $mform->addElement('static', 'passwordpolicyinfo', '', print_password_policy());
-        }
-        $mform->addElement('password', 'password', get_string('password'), 'maxlength="32" size="12"');
-        $mform->setType('password', core_user::get_property_type('password'));
-        $mform->addRule('password', get_string('missingpassword'), 'required', null, 'client');
-        
-        $mform->addElement('passwordunmask', 'confirmpassword', get_string('confirmpassword'), 'maxlength="32" size="12"');
-        $mform->setType('confirmpassword', core_user::get_property_type('password'));
-        $mform->addRule(array('password','confirmpassword'), get_string('passwordsdiffer'), 'compare', 'eq', 'client');
-
-        $mform->addElement('header', 'supplyinfo', get_string('supplyinfo'),'');
-
         $mform->addElement('text', 'email', get_string('email'), 'maxlength="100" size="25"');
         $mform->setType('email', core_user::get_property_type('email'));
         $mform->addRule('email', get_string('missingemail'), 'required', null, 'client');
@@ -64,6 +44,22 @@ class login_signup_form extends moodleform implements renderable, templatable {
         $mform->setType('email2', core_user::get_property_type('email'));
         $mform->addRule('email2', get_string('missingemail'), 'required', null, 'client');
         $mform->setForceLtr('email2');
+
+        $mform->addElement('text', 'username', get_string('username'), 'maxlength="100" size="12" autocapitalize="none"');
+        $mform->setType('username', PARAM_RAW);
+        $mform->addRule('username', get_string('missingusername'), 'required', null, 'client');
+
+        $mform->addElement('password', 'password', get_string('password'), 'maxlength="32" size="12"');
+        $mform->setType('password', core_user::get_property_type('password'));
+        $mform->addRule('password', get_string('missingpassword'), 'required', null, 'client');
+        if (!empty($CFG->passwordpolicy)){
+            $mform->addElement('static', 'passwordpolicyinfo', '', print_password_policy());
+        }
+        
+        $mform->addElement('passwordunmask', 'confirmpassword', get_string('confirmpassword'), 'maxlength="32" size="12"');
+        $mform->setType('confirmpassword', core_user::get_property_type('password'));
+        $mform->addRule(array('password','confirmpassword'), get_string('passwordsdiffer'), 'compare', 'eq', 'client');
+ 
 
         $namefields = useredit_get_required_name_fields();
         foreach ($namefields as $field) {
@@ -76,11 +72,11 @@ class login_signup_form extends moodleform implements renderable, templatable {
             $mform->addRule($field, get_string($stringid), 'required', null, 'client');
         }
 
-        $mform->addElement('text', 'city', get_string('city'), 'maxlength="120" size="20"');
-        $mform->setType('city', core_user::get_property_type('city'));
-        if (!empty($CFG->defaultcity)) {
-            $mform->setDefault('city', $CFG->defaultcity);
-        }
+//         $mform->addElement('text', 'city', get_string('city'), 'maxlength="120" size="20"');
+//         $mform->setType('city', core_user::get_property_type('city'));
+//         if (!empty($CFG->defaultcity)) {
+//             $mform->setDefault('city', $CFG->defaultcity);
+//         }
 
         $country = get_string_manager()->get_list_of_countries();
         $default_country[''] = get_string('selectacountry');
@@ -96,7 +92,17 @@ class login_signup_form extends moodleform implements renderable, templatable {
             $mform->setDefault('country', '');
         }
 
-        profile_signup_fields($mform);
+        // Profile fields
+        if ($fields = profile_get_signup_fields()) {
+            foreach ($fields as $field) {
+                // Check if we change the categories.
+                if (!isset($currentcat) || $currentcat != $field->categoryid) {
+                     $currentcat = $field->categoryid;
+//                      $mform->addElement('header', 'category_'.$field->categoryid, format_string($field->categoryname));
+                };
+                $field->object->edit_field($mform);
+            }
+        }
 
         if (signup_captcha_enabled()) {
             $mform->addElement('recaptcha', 'recaptcha_element', get_string('security_question', 'auth'));
