@@ -586,13 +586,17 @@ class theme_bootstrap_core_renderer extends core_renderer {
     }
 	public function page_heading($tag = 'h1') {
 	    $coursecontext = context_course::instance($this->page->course->id);
-	    $summary = file_rewrite_pluginfile_urls($this->page->course->summary, 'pluginfile.php', $coursecontext->id, 'course', 'summary', null);
-        $summary = format_text($summary,FORMAT_HTML,array('para'=>false));
-	    
-// 	    $summary = format_text($this->page->course->summary,FORMAT_HTML,array('para'=>false));
+	    if (function_exists("file_rewrite_pluginfile_urls"))
+	    {
+            $summary = format_text($summary,FORMAT_HTML,array('para'=>false));
+            $summary = file_rewrite_pluginfile_urls($this->page->course->summary, 'pluginfile.php', $coursecontext->id, 'course', 'summary', null);
+	    } else {
+	        $summary = format_text($this->page->course->summary,FORMAT_HTML,array('para'=>false));
+	    }
 	    
         return parent::page_heading($tag). html_writer::tag('div', $summary, array('id' => 'fpCourseSummary'));
     }
+    
 	public function home_link() {
         global $CFG, $SITE;
 		if (!empty($CFG->target_release) && $CFG->target_release != $CFG->release) {
