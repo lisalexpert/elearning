@@ -18,10 +18,17 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->locate("localplugins")) {
     $tmp = new admin_settingpage("global_banner", get_string("pluginname", "local_global_banner"));
+    
     $tmp->add(new admin_setting_confightmleditor("local_global_banner/message",
                                                  get_string("setting_message", "local_global_banner"),
                                                  get_string("setting_message_info", "local_global_banner"),
                                                  ""));
+    
+    $tmp->add(new admin_setting_configtext("local_global_banner/class",
+                                                 get_string("setting_class", "local_global_banner"),
+                                                 get_string("setting_class_info", "local_global_banner"),
+                                                 "alert-warning"));
+    
     $tmp->add(new admin_setting_configcheckbox("local_global_banner/visible",
                                                get_string("setting_visible", "local_global_banner"),
                                                get_string("setting_visible_info", "local_global_banner"),

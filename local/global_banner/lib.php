@@ -24,16 +24,25 @@ function local_global_banner_category_notification () {
 
     $config = get_config("local_global_banner");
     if ($config->visible) {
-        //use context_course rather then context_system because of caching
+        if ($config->class == "") {
+            $config->class = "alert-warning";
+        }
+        
         $options = array("context" => context_course::instance($site->id), "trusted" => true, "para" => false);
         $message = format_text($config->message, FORMAT_MOODLE, $options);
+        
         \core\notification::add($message, \core\output\notification::NOTIFY_INFO);
-        echo \html_writer::script("(function() {" .
-                                  "var notificationHolder = document.getElementById('user-notifications');" .
-                                  "if (!notificationHolder) { return; }" .
-                                  "notificationHolder.className += ' courseannouncement';" .
-                                  "$('#user-notifications').insertAfter('.full-bg');" .
-                                  "})();"
+        echo \html_writer::script(
+"(function() {
+    var notificationHolder = document.getElementById('user-notifications');
+    if (!notificationHolder) {
+        return;
+    }
+                    
+    $('#user-notifications').insertAfter('.full-bg');
+    $('#user-notifications .alert').addClass('" . $config->class . "');
+    $('#user-notifications .alert').removeClass('alert-info');
+})();"
         );
     }
 
@@ -46,15 +55,24 @@ function local_global_banner_course_notification () {
     $site = isset($SITE) ? $SITE : get_site();
     $config = get_config("local_global_banner");
     if ($config->visible) {
-        //use context_course rather then context_system because of caching
+        if ($config->class == "") {
+            $config->class = "alert-warning";
+        }
+        
         $options = array("context" => context_course::instance($site->id), "trusted" => true, "para" => false);
         $message = format_text($config->message, FORMAT_MOODLE, $options);
+        
         \core\notification::add($message, \core\output\notification::NOTIFY_INFO);
-        echo \html_writer::script("(function() {" .
-                                  "var notificationHolder = document.getElementById('user-notifications');" .
-                                  "if (!notificationHolder) { return; }" .
-                                  "notificationHolder.className += ' courseannouncement'" .
-                                  "})();"
+        echo \html_writer::script(
+"document.addEventListener('DOMContentLoaded', function(event) { 
+    var notificationHolder = document.getElementById('user-notifications');
+    if (!notificationHolder) {
+        return;
+    }
+      
+    $('#user-notifications .alert').addClass('" . $config->class . "');
+    $('#user-notifications .alert').removeClass('alert-info');
+});"
         );
     }
     return true;
