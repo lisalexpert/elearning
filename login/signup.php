@@ -84,6 +84,10 @@ if ($mform_signup->is_cancelled()) {
 
 } else if ($user = $mform_signup->get_data()) {
     // Add missing required fields.
+    $user->email2 = $user->email;
+    $user->username = $user->email;
+    $user->confirmpassword = $user->password;
+        
     $user = signup_setup_new_user($user);
 
     $authplugin->user_signup($user, true); // prints notice and link to login/index.php

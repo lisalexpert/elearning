@@ -40,14 +40,14 @@ class login_signup_form extends moodleform implements renderable, templatable {
         $mform->addRule('email', get_string('missingemail'), 'required', null, 'client');
         $mform->setForceLtr('email');
 
-        $mform->addElement('text', 'email2', get_string('emailagain'), 'maxlength="100" size="25"');
-        $mform->setType('email2', core_user::get_property_type('email'));
-        $mform->addRule('email2', get_string('missingemail'), 'required', null, 'client');
-        $mform->setForceLtr('email2');
+//         $mform->addElement('text', 'email2', get_string('emailagain'), 'maxlength="100" size="25"');
+//         $mform->setType('email2', core_user::get_property_type('email'));
+        //$mform->addRule('email2', get_string('missingemail'), 'required', null, 'client');
+//         $mform->setForceLtr('email2');
 
-        $mform->addElement('text', 'username', get_string('username'), 'maxlength="100" size="12" autocapitalize="none"');
-        $mform->setType('username', PARAM_RAW);
-        $mform->addRule('username', get_string('missingusername'), 'required', null, 'client');
+//         $mform->addElement('text', 'username', get_string('username'), 'maxlength="100" size="12" autocapitalize="none"');
+//         $mform->setType('username', PARAM_RAW);
+        //$mform->addRule('username', get_string('missingusername'), 'required', null, 'client');
 
         $mform->addElement('password', 'password', get_string('password'), 'maxlength="32" size="12"');
         $mform->setType('password', core_user::get_property_type('password'));
@@ -56,9 +56,9 @@ class login_signup_form extends moodleform implements renderable, templatable {
             $mform->addElement('static', 'passwordpolicyinfo', '', print_password_policy());
         }
         
-        $mform->addElement('passwordunmask', 'confirmpassword', get_string('confirmpassword'), 'maxlength="32" size="12"');
-        $mform->setType('confirmpassword', core_user::get_property_type('password'));
-        $mform->addRule(array('password','confirmpassword'), get_string('passwordsdiffer'), 'compare', 'eq', 'client');
+//         $mform->addElement('passwordunmask', 'confirmpassword', get_string('confirmpassword'), 'maxlength="32" size="12"');
+//         $mform->setType('confirmpassword', core_user::get_property_type('password'));
+        //$mform->addRule(array('password','confirmpassword'), get_string('passwordsdiffer'), 'compare', 'eq', 'client');
  
 
         $namefields = useredit_get_required_name_fields();
@@ -140,6 +140,10 @@ class login_signup_form extends moodleform implements renderable, templatable {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
+        
+        $data['email2'] = $data['email'];
+        $data['username'] = $data['email'];
+        $data['confirmpassword'] = $data['password'];
 
         if (signup_captcha_enabled()) {
             $recaptchaelement = $this->_form->getElement('recaptcha_element');
