@@ -598,7 +598,7 @@ if ( url.match("#") ) {
           $coursecontext = context_course::instance($course->id);
           
           $summary = file_rewrite_pluginfile_urls($course->summary, 'pluginfile.php', $coursecontext->id, 'course', 'summary', null);
-          $summary = format_text($summary,FORMAT_HTML,array('para'=>false));
+          $summary = format_text($summary,FORMAT_HTML,array('para'=>false, 'noclean'=>true));
           
           $dom->loadHTML('<?xml encoding="utf-8" ?>' . $summary);
           $classname = 'course_summary_flyer';
