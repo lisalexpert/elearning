@@ -95,6 +95,42 @@ echo $OUTPUT->doctype() ?>
 			top: 12px;
 		}
 	}
+	
+	<?php
+	$chelper = new coursecat_helper();
+	$css = "";
+	foreach (coursecat::make_categories_list() as $cat_id => $cat_name) {
+        $coursecat = coursecat::get($cat_id);
+        $categorycontent = strip_tags($chelper->get_category_formatted_description($coursecat),'<img><span>');
+      
+        if($categorycontent) {
+            $doc = new DOMDocument();
+            $doc->loadHTML($categorycontent);    
+            $selector = new DOMXPath($doc);
+            
+            // Modify only new categories.
+            if (!in_array($coursecat->id, array(7, 8, 9, 10, 11))) {
+                $span = $selector->query('//span')[0];
+                if ($span) {
+                    $color = explode(": ", $span->getAttribute('style'))[1];
+                    $color = rtrim($color, ";");
+                    
+                    $css .= "
+#frontpage-category-names .category-{$coursecat->id} > a > .box > .content,
+#frontpage-category-combo .category-{$coursecat->id} > a > .box > .content,
+.category-{$coursecat->id} .numberofcourse, div.category-{$coursecat->id} .numberofcourse {background-color: {$color};}
+#frontpage-category-combo .category-{$coursecat->id} .categ-courses>li:before {color: {$color};}
+.category-{$coursecat->id} .categ-button {color: {$color};}
+#page-course-index-category .category-{$coursecat->id} .svg-content2>svg path {fill: {$color} !important;}
+#page-course-index-category .category-{$coursecat->id} .categoryname {color: {$color};}";
+                }
+            }
+        }
+        
+	}
+	echo $css;
+	?>
+	
 	</style>
 </head>
 
