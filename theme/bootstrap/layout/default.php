@@ -99,6 +99,8 @@ echo $OUTPUT->doctype() ?>
 	<?php
 	$chelper = new coursecat_helper();
 	$css = "";
+	require_once($CFG->libdir . '/coursecatlib.php');
+	
 	foreach (coursecat::make_categories_list() as $cat_id => $cat_name) {
         $coursecat = coursecat::get($cat_id);
         $categorycontent = strip_tags($chelper->get_category_formatted_description($coursecat),'<img><span>');
