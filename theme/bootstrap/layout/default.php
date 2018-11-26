@@ -96,12 +96,18 @@ echo $OUTPUT->doctype() ?>
 		}
 	}
 	
-	<?php
+	</style>
+</head>
+
+<body <?php echo $OUTPUT->body_attributes($setzoom); ?>>
+<?php
 	$chelper = new coursecat_helper();
 	$css = "";
 	require_once($CFG->libdir . '/coursecatlib.php');
-	
+	require_once($CFG->libdir . '/filelib.php');
 	foreach (coursecat::make_categories_list() as $cat_id => $cat_name) {
+	    if (in_array($coursecat->id, array(7, 8, 9, 10, 11))) continue;
+	    
         $coursecat = coursecat::get($cat_id);
         $categorycontent = strip_tags($chelper->get_category_formatted_description($coursecat),'<img><span>');
       
@@ -111,13 +117,12 @@ echo $OUTPUT->doctype() ?>
             $selector = new DOMXPath($doc);
             
             // Modify only new categories.
-            if (!in_array($coursecat->id, array(7, 8, 9, 10, 11))) {
-                $span = $selector->query('//span')[0];
-                if ($span) {
-                    $color = explode(": ", $span->getAttribute('style'))[1];
-                    $color = rtrim($color, ";");
-                    
-                    $css .= "
+            $span = $selector->query('//span')[0];
+            if ($span) {
+                $color = explode(": ", $span->getAttribute('style'))[1];
+                $color = rtrim($color, ";");
+                
+                $css .= "
 #frontpage-category-names .category-{$coursecat->id} > a > .box > .content,
 #frontpage-category-combo .category-{$coursecat->id} > a > .box > .content,
 .category-{$coursecat->id} .numberofcourse, div.category-{$coursecat->id} .numberofcourse {background-color: {$color};}
@@ -125,19 +130,11 @@ echo $OUTPUT->doctype() ?>
 .category-{$coursecat->id} .categ-button {color: {$color};}
 #page-course-index-category .category-{$coursecat->id} .svg-content2>svg path {fill: {$color} !important;}
 #page-course-index-category .category-{$coursecat->id} .categoryname {color: {$color};}";
-                }
             }
         }
-        
 	}
 	echo $css;
 	?>
-	
-	</style>
-</head>
-
-<body <?php echo $OUTPUT->body_attributes($setzoom); ?>>
-
 <?php echo $OUTPUT->standard_top_of_body_html() ?>
 
 <nav role="navigation" class="navbar navbar-default">
