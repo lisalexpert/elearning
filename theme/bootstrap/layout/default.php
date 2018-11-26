@@ -96,18 +96,12 @@ echo $OUTPUT->doctype() ?>
 		}
 	}
 	
-	</style>
-</head>
-
-<body <?php echo $OUTPUT->body_attributes($setzoom); ?>>
-<?php
+	<?php
 	$chelper = new coursecat_helper();
 	$css = "";
 	require_once($CFG->libdir . '/coursecatlib.php');
 	require_once($CFG->libdir . '/filelib.php');
 	foreach (coursecat::make_categories_list() as $cat_id => $cat_name) {
-	    if (in_array($coursecat->id, array(7, 8, 9, 10, 11))) continue;
-	    
         $coursecat = coursecat::get($cat_id);
         $categorycontent = strip_tags($chelper->get_category_formatted_description($coursecat),'<img><span>');
       
@@ -135,6 +129,11 @@ echo $OUTPUT->doctype() ?>
 	}
 	echo $css;
 	?>
+	</style>
+</head>
+
+<body <?php echo $OUTPUT->body_attributes($setzoom); ?>>
+
 <?php echo $OUTPUT->standard_top_of_body_html() ?>
 
 <nav role="navigation" class="navbar navbar-default">
