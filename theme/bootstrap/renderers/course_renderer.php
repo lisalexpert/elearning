@@ -584,6 +584,11 @@ if ( url.match("#") ) {
         $courses = $coursecat->get_courses($chelper->get_courses_display_options());
         $coursescontent = html_writer::start_tag('ul',array('class'=>'categ-courses'));
         foreach ($courses as $course) {
+          $course_obj = get_course($course->id);
+          if (!empty($course_obj->lang) && $course_obj->lang != current_language()) {
+               continue;
+          }
+            
           $coursescontent .= html_writer::start_tag('li');
           
           $coursename = $chelper->get_course_formatted_name($course);
@@ -596,7 +601,7 @@ if ( url.match("#") ) {
           
           $dom = new DOMDocument();
           $coursecontext = context_course::instance($course->id);
-          
+
           $summary = file_rewrite_pluginfile_urls($course->summary, 'pluginfile.php', $coursecontext->id, 'course', 'summary', null);
           $summary = format_text($summary,FORMAT_HTML,array('para'=>false, 'noclean'=>true));
           
