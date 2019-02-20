@@ -265,7 +265,8 @@ class theme_bootstrap_core_renderer extends core_renderer {
       
         }
             $branchlabel = get_string('contact_us', 'theme_bootstrap');
-            $branchurl   = new moodle_url('https://www.informea.org/en/contact');
+            $branchurl = new moodle_url('/local/staticpage/view.php?page=contact_form');
+//             $branchurl   = new moodle_url('https://www.informea.org/en/contact');
             $branchtitle = get_string('contact_us', 'theme_bootstrap');
             $branchsort  = 12000;
  

@@ -183,7 +183,8 @@ class theme_bootstrap_unep_core_renderer extends theme_bootstrap_core_renderer {
       // $branch->add('<i class="fa fa-sign-out"></i>'.get_string('logout').'',new moodle_url('/login/logout.php'),get_string('logout'));   
     }
     $branchlabel = get_string('contact_us', 'theme_bootstrap');
-    $branchurl = new moodle_url('https://www.informea.org/en/contact');
+    $branchurl = new moodle_url('/local/staticpage/view.php?page=contact_form');
+//     $branchurl = new moodle_url('https://www.informea.org/en/contact');
     $branchtitle = get_string('contact_us', 'theme_bootstrap');
     $branchsort = 12000;
 
