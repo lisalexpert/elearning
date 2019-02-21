@@ -17,8 +17,10 @@
 
 $hassidepre = true;//$PAGE->blocks->region_has_content('side-pre', $OUTPUT);
 $hassidepost = true;//$PAGE->blocks->region_has_content('side-post', $OUTPUT);
+$hassideinner = $PAGE->blocks->region_has_content('side-inner', $OUTPUT);
 $knownregionpre = true;//$PAGE->blocks->is_known_region('side-pre');
 $knownregionpost = true;//$PAGE->blocks->is_known_region('side-post');
+$knownregioninner = $PAGE->blocks->is_known_region('side-inner');
 if(!isloggedin()){
 	$hassidepre=false;
 	$hassidepost=false;
@@ -51,7 +53,7 @@ echo $OUTPUT->doctype() ?>
         smartlook('init', '0de702f6d7de31817c785d9aa3f47f68815193da');
     </script>
     <?php echo $OUTPUT->standard_head_html(); ?>
-	<link id="print" media="all" type="text/css" href="<?php echo $CFG->wwwroot.'/theme/'.$CFG->theme.'/style/print.css' ?>" rel="stylesheet" />
+	<link id="print" media="all" type="text/css" href="<?php echo $CFG->wwwroot.'/theme/'.$CFG->theme.'/style/print.css' ?>" rel="stylesheet" />	
 	<style>
 	.disabled, .disabled:focus, .disabled:hover{
 		background-color:transparent !important;
@@ -164,24 +166,106 @@ echo $OUTPUT->doctype() ?>
 </nav>
 <?php
 if(!isloggedin() || isguestuser()){
-  if(strpos($current_page,'/login') !== 0){
-    global $SESSION;
-    $SESSION->wantsurl = qualified_me();
-  }
+    if(strpos($current_page,'/login') !== 0){
+        global $SESSION;
+        $SESSION->wantsurl = qualified_me();
+    }
 }
 if($current_page == '/course/view.php'){ 
-  $dom = new DOMDocument();
-  $dom->loadHTML(format_text($this->page->course->summary,FORMAT_HTML,array('para'=>false)));
-  $classname = 'course_summary_image_wrapper';
-  $a = new DOMXPath($dom);
-  $spans = $a->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
-  for ($i = $spans->length - 1; $i > -1; $i--) {
-    echo file_rewrite_pluginfile_urls($spans->item($i)->C14N(), 'pluginfile.php', $PAGE->context->id, 'course', 'summary', null); 
-    break;
-  }
-  unset($dom);
-  unset($spans);
-  unset($a);
+    $dom = new DOMDocument();
+    $dom->loadHTML(format_text($this->page->course->summary,FORMAT_HTML,array('para'=>false)));
+    $classname = 'course_summary_image_wrapper';
+    $a = new DOMXPath($dom);
+    $spans = $a->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+    for ($i = $spans->length - 1; $i > -1; $i--) {
+        echo file_rewrite_pluginfile_urls($spans->item($i)->C14N(), 'pluginfile.php', $PAGE->context->id, 'course', 'summary', null); 
+        break;
+    }
+    unset($dom);
+    unset($spans);
+    unset($a);
+}
+
+/* Helper functions for the category page top menu. */
+function topmenu_subcategories(coursecat_helper $chelper, $coursecat, $depth) {
+    $subcategories = $coursecat->get_children($chelper->get_categories_display_options());
+    $content = html_writer::start_tag('div', array('class' => 'top-menu-subcategories'));
+    foreach ($subcategories as $subcategory) {
+        $content .= topmenu_category($chelper, $subcategory, $depth + 1);
+    }
+    $content .= html_writer::end_tag('div');
+    return $content;
+}
+
+function topmenu_category(coursecat_helper $chelper, $coursecat, $depth) {
+    $classes = array(
+            'category', 
+            'top-menu-category', 
+            'col-lg-2half',
+    //      'col-sm-4',
+            'categ-' . $coursecat->idnumber,
+            'category-' . $coursecat->id
+    );
+    if($GLOBALS['categoryid']  != $coursecat->id){
+        $classes[] = 'inactive'; 
+    } else {
+        $classes[] = 'active';
+    }
+    
+    $categorycontent = strip_tags($chelper->get_category_formatted_description($coursecat),'<img>');
+    $hidden = false;
+    
+    if($categorycontent) {
+        $doc = new DOMDocument();
+        $doc->loadHTML($categorycontent);    
+        $selector = new DOMXPath($doc);
+        
+        $result = $selector->query('//img');
+        
+        // loop through all found items
+        foreach($result as $node) {
+            $src = $node->getAttribute('src');
+            $ext = pathinfo($src, PATHINFO_EXTENSION);
+            if($ext == 'svg'){
+                $svgcontent = file_get_contents($src);
+                $dom = new DOMDocument();
+                $dom->loadXML($svgcontent);
+                $svg = $dom->getElementsByTagName('svg');
+                if($svg && $svg->item(0)) {
+                    $categorycontent = '<div class="svg-content"><div class="svg-content1"><div class="svg-content2">' . $svg->item(0)->C14N() . '</div></div></div>';
+                } else {
+                    $hidden = true;
+                }
+            }
+            break;
+        }
+    }
+     if ($hidden) return '';
+    
+    $content = html_writer::start_tag('div', array(
+        'class' => join(' ', $classes),
+        'data-categoryid' => $coursecat->id,
+        'data-depth' => $depth,
+        'data-showcourses' => $chelper->get_show_courses()
+    ));
+    
+    // category name
+    $categoryname = $coursecat->get_formatted_name();
+    $myBox = html_writer::start_tag('div', array('class' => 'box'));
+    $myBox .= html_writer::tag('div', $categorycontent, array('class' => 'content'));
+    $myBox .= html_writer::start_tag('div', array('class' => 'info'));
+    
+    $myBox .= html_writer::tag(($depth > 1) ? 'h4' : 'h3', $categoryname, array('class' => 'categoryname'));
+    $myBox .= html_writer::end_tag('div'); 
+    $myBox .= html_writer::end_tag('div'); // .info
+    
+    // add category content to the output
+    $content .= html_writer::link(new moodle_url('/course/index.php',
+                array('categoryid' => $coursecat->id)),
+                $myBox);
+    $content .= html_writer::end_tag('div'); // .category
+    
+    return $content;
 }
 ?>
 <header class="moodleheader">
@@ -210,11 +294,30 @@ if($current_page == '/course/view.php'){
     <div id="page-content" class="row">
         <div id="region-main" class="<?php echo $regions['content']; ?>">
 			<div class="container" style="width:100%;max-width:1170px;">
-				<?php
-				echo $OUTPUT->course_content_header();
-				echo $OUTPUT->main_content();
-				echo $OUTPUT->course_content_footer();
-				?>
+                <?php 
+                if ($knownregioninner) { 
+                    $chelper = new coursecat_helper();
+                    $categorycontent = topmenu_subcategories($chelper, coursecat::get(0), 0);
+                    echo $OUTPUT->heading($categorycontent, 2, array('class'=>'full-bg'));
+                }
+                ?>
+                
+			    <?php if ($knownregioninner && $hassideinner) { ?>
+                    <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 nopadd-right">
+        				<?php
+        				echo $OUTPUT->course_content_header();
+        				echo $OUTPUT->main_content();
+        				echo $OUTPUT->course_content_footer();
+        				?>
+				    </div>
+    				<div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 categ-desc nopadd-right">
+    				    <?php  echo $OUTPUT->blocks('side-inner'); ?>
+    				</div>
+				<?php } else {
+				    echo $OUTPUT->course_content_header();
+    				echo $OUTPUT->main_content();
+    				echo $OUTPUT->course_content_footer();
+				} ?>
 			</div>
         </div>
 	

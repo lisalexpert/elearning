@@ -478,6 +478,7 @@ if ( url.match("#") ) {
             set_attributes(array('class' => 'frontpage-category-combo'));
         return $this->coursecat_tree($chelper, coursecat::get(0));
     }
+    
     protected function coursecat_tree(coursecat_helper $chelper, $coursecat) {
         $categorycontent = $this->coursecat_category_content($chelper, $coursecat, 0);
         if (empty($categorycontent)) {
@@ -495,6 +496,7 @@ if ( url.match("#") ) {
 
         return $content;
     }
+    
     protected function coursecat_category(coursecat_helper $chelper, $coursecat, $depth) {
 
       if(($chelper->get_show_courses() == self::COURSECAT_SHOW_COURSES_EXPANDED) && ($GLOBALS['categoryid']  == $coursecat->id)){
@@ -531,7 +533,7 @@ if ( url.match("#") ) {
             $dom = new DOMDocument();
             $dom->loadXML($svgcontent);
             $svg = $dom->getElementsByTagName('svg');
-            if($svg){
+            if($svg && $svg->item(0)){
               $categorycontent = '<div class="svg-content"><div class="svg-content1"><div class="svg-content2">' . $svg->item(0)->C14N() . '</div></div></div>';
             }
           }
@@ -653,8 +655,9 @@ if ( url.match("#") ) {
       // Return the course category tree HTML
       return $content;
     }
+    
     public function course_category($category) {
-          global $CFG, $OUTPUT;
+          global $CFG, $OUTPUT, $PAGE;
           require_once($CFG->libdir. '/coursecatlib.php');
           $coursecat = coursecat::get(is_object($category) ? $category->id : $category);
           
@@ -691,24 +694,26 @@ if ( url.match("#") ) {
                 
           $output = '';
           
-          $output .= $OUTPUT->heading(html_writer::tag('span',html_writer::tag('span',get_string('ourcourses','theme_bootstrap'))),2,array('class'=>'full-bg'));
+//           $top_menu_cats = $this->topmenu_tree($chelper, coursecat::get(0));
+//           $output .= $OUTPUT->heading($top_menu_cats, 2, array('class'=>'full-bg'));
+          // $output .= $OUTPUT->heading(html_writer::tag('span',html_writer::tag('span',get_string('ourcourses','theme_bootstrap'))),2,array('class'=>'full-bg'));
           
-          $output .= html_writer::start_tag('div',array('class'=>'row categ-desc'));
-          $output .= html_writer::start_tag('div',array('class'=>'col-lg-9 col-md-12 col-sm-12 col-xs-12 categ-desc2'));
-          $output .= $this->coursecat_category($chelper,$coursecat,1);
+          $output .= html_writer::start_tag('div', array('class'=>'row categ-desc'));
+//           $output .= html_writer::start_tag('div', array('class'=>'col-lg-9 col-md-12 col-sm-12 col-xs-12 categ-desc2'));
+          $output .= html_writer::start_tag('div', array('class'=>'col-lg-12 col-md-12 col-sm-12 col-xs-12 categ-desc2'));
+          $output .= $this->coursecat_category($chelper, $coursecat, 1);
           $output .= html_writer::end_tag('div');
-          $output .= html_writer::start_tag('div',array('class'=>'col-lg-3 col-md-12 col-sm-12 col-xs-12 categ-other'));
-          $output .= html_writer::start_tag('div',array('class'=>'box'));
-          $output .= $OUTPUT->heading(get_string('othercourses','theme_bootstrap'),2,array('class'=>'box-title'));
-          $output .= html_writer::start_tag('div',array('class'=>'box-content'));
           
-          $chelper->set_show_courses(self::COURSECAT_SHOW_COURSES_EXPANDED);
+//           $output .= html_writer::start_tag('div', array('class'=>'col-lg-3 col-md-12 col-sm-12 col-xs-12 categ-other'));
+//           $output .= html_writer::start_tag('div', array('class'=>'box'));
+//           $output .= $OUTPUT->heading(get_string('othercourses','theme_bootstrap'), 2, array('class'=>'box-title'));
+//           $output .= html_writer::start_tag('div', array('class'=>'box-content'));
+//           $chelper->set_show_courses(self::COURSECAT_SHOW_COURSES_EXPANDED);
+//           $output .= $this->coursecat_tree($chelper, coursecat::get(0));
+//           $output .= html_writer::end_tag('div');
+//           $output .= html_writer::end_tag('div');
+//           $output .= html_writer::end_tag('div');
           
-          $output .= $this->coursecat_tree($chelper, coursecat::get(0));
-          
-          $output .= html_writer::end_tag('div');
-          $output .= html_writer::end_tag('div');
-          $output .= html_writer::end_tag('div');
           $output .= html_writer::end_tag('div');
           
           

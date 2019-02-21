@@ -62,7 +62,7 @@ $THEME->layouts = array(
     // Standard layout with blocks, this is recommended for most pages with general information.
     'standard' => array(
         'file' => 'default.php',
-        'regions' => array('side-pre', 'side-post'),
+        'regions' => array('side-pre', 'side-post', 'side-inner'),
         'defaultregion' => 'side-pre',
     ),
     // Main course page.
@@ -74,7 +74,7 @@ $THEME->layouts = array(
     ),
     'coursecategory' => array(
         'file' => 'default.php',
-        'regions' => array('side-pre', 'side-post'),
+        'regions' => array('side-pre', 'side-post', 'side-inner'),
         'defaultregion' => 'side-pre',
     ),
     // Part of course, typical for modules - default page layout if $cm specified in require_login().
