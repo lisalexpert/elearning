@@ -293,7 +293,7 @@ function topmenu_category(coursecat_helper $chelper, $coursecat, $depth) {
 
     <div id="page-content" class="row">
         <div id="region-main" class="<?php echo $regions['content']; ?>">
-			<div class="container" style="width:100%;max-width:1170px;">
+			<div class="container" style="width:100%;max-width:1280px;">
                 <?php 
                 if ($knownregioninner) { 
                     $chelper = new coursecat_helper();
