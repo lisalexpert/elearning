@@ -1667,3 +1667,9 @@ table.course_section_elements {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
  }
+ 
+ #user-notifications .alert-block {
+ 	position: absolute;
+	left: 0;
+	right: 0;
+ }
